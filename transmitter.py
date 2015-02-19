@@ -9,7 +9,7 @@ import requests
 def transmit_reading(r):
     reading = dict(sensor_name=r['cell_id'],
                    temp=r['temperature'],
-                   time=r['time'].timestamp(),
+                   time=r['hub_time'].timestamp(),
                    verification='c0ffee')
     response = requests.post('http://heatseeknyc.com/readings.json',
                              json=dict(reading=reading))
