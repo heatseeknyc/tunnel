@@ -28,14 +28,18 @@ def transmit():
             cursor.execute('select * from readings'
                            ' where relayed_time is null')
             readings = cursor.fetchall()
-
         if readings: logging.info('{} unrelayed readings'.format(len(readings)))
+
+        failed_cell_ids = set()
         for reading in readings:
-            if transmit_reading(reading):
-                with db:
-                    db.cursor().execute('update readings set relayed_time = now()'
-                                        ' where id=%(id)s', reading)
-            time.sleep(1)
+            cell_id = reading['cell_id']
+            if cell_id not in failed_cell_ids:
+                if transmit_reading(reading):
+                    with db:
+                        db.cursor().execute('update readings set relayed_time = now()'
+                                            ' where id=%(id)s', reading)
+                else: failed_cell_ids.add(cell_id)
+                time.sleep(1)
 
         time.sleep(1)
 
