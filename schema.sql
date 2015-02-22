@@ -7,9 +7,20 @@ create table readings (
     time timestamp not null default now(),
     relayed_time timestamp
 );
+create index on readings (hub_id, cell_id, hub_time desc);
 
 create table hubs (
-    id text,
+    id text primary key,
     port integer,
-    time timestamp not null default now()
+    created timestamp not null default now(),
+    updated timestamp not null default now()
 );
+
+create table hubs_log (
+    id serial primary key,
+    hub_id text,
+    port integer,
+    created timestamp not null default now(),
+    updated timestamp not null default now()
+);
+create index on hubs (hub_id, time desc);

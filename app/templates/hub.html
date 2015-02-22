@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Cells</h2>
+    <ul>
+      {% for cell in cells %}
+      <li>{{ cell.cell_id }}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>Hub {{ request.view_args.hub_id }}</h2>
+    <ul>
+      {% for log in logs %}
+      <li>{{ log.time }} <b>{{ log.port }}</b></li>
+      {% endfor %}
+    </ul>
+
+  </body>
+</html>

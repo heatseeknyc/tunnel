@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
   <body>
-    {% for h in hubs %}
-    <div>{% for x in h %}{{ x }} {% endfor %}</div>
-    {% endfor %}
+    <h1>Hubs</h1>
+    <ul>
+      {% for hub in hubs %}
+      <li><a href="{{ url_for('hub', **hub) }}">{{ hub.hub_id }}</a></li>
+      {% endfor %}
+    </ul>
   </body>
 </html>
