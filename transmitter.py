@@ -15,7 +15,7 @@ def transmit_reading(r):
                              json=dict(reading=reading))
     if response.status_code == 200: return True
     else:
-        logging.error('response={} for request={}'.format(response.status_code, response.request.body))
+        logging.error('request {} got {} response {}'.format(response.request.body, response.status_code, response.text))
         return False
 
 def transmit():
