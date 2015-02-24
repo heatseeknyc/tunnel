@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging; logging.basicConfig(level=logging.INFO)
+import operator
 
 import flask
 import flask.views
@@ -38,8 +39,10 @@ class Index(flask.views.MethodView):
 class Hubs(flask.views.MethodView):
     def get(self):
         cursor = db.cursor()
-        cursor.execute('select distinct hub_id from hubs order by hub_id')
-        return flask.render_template('hubs.html', hubs=cursor.fetchall())
+        cursor.execute('select distinct on (hub_id) hub_id, time, port'
+                       ' from hubs order by hub_id, time desc')
+        hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
+        return flask.render_template('hubs.html', hubs=hubs)
 
     def post(self):
         db.cursor().execute('insert into hubs (hub_id, port)'
@@ -54,7 +57,7 @@ class Hub(flask.views.MethodView):
                        ' where hub_id=%s order by cell_id', (hub_id,))
         cells = cursor.fetchall()
         cursor.execute('select time, port from hubs'
-                       ' where hub_id=%s order by time', (hub_id,))
+                       ' where hub_id=%s order by time desc', (hub_id,))
         logs = cursor.fetchall()
         return flask.render_template('hub.html', cells=cells, logs=logs)
 

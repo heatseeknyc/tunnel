@@ -4,7 +4,7 @@
     <h1>Hubs</h1>
     <ul>
       {% for hub in hubs %}
-      <li><a href="{{ url_for('hub', **hub) }}">{{ hub.hub_id }}</a></li>
+      <li><a href="{{ url_for('hub', hub_id=hub.hub_id) }}"><code>{{ hub.hub_id }}</code></a> {{ hub.time }}</li>
       {% endfor %}
     </ul>
   </body>
