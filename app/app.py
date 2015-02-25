@@ -67,7 +67,8 @@ class Hub(flask.views.MethodView):
 class Readings(flask.views.MethodView):
     def get(self):
         cursor = db.cursor()
-        cursor.execute('select * from readings order by time desc limit 100')
+        cursor.execute('select hub_time, hub_id, cell_id, temperature, relay, relayed_time'
+                       ' from readings order by hub_time desc limit 100')
         return flask.render_template('readings.html', readings=cursor.fetchall())
 
     def post(self):
