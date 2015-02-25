@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <h2>Cells</h2>
+    <h2>Status Log</h2>
     <ul>
-      {% for cell in cells %}
-      <li>{{ cell.cell_id }}</li>
+      {% for l in logs %}
+      <li>{{ l.time }} <b>{{ l.port }}</b></li>
       {% endfor %}
     </ul>
 
-    <h2>Hub</h2>
+    <h2>Cells</h2>
     <ul>
-      {% for log in logs %}
-      <li>{{ log.time }} <b>{{ log.port }}</b></li>
+      {% for c in cells %}
+      <li>{{ c.time }} <code>{{ c.cell_id }}</code></li>
+      {% endfor %}
+    </ul>
+
+    <h2>Readings</h2>
+    <ul>
+      {% for r in readings %}
+      <li>{{ r.hub_time }} <code>{{ r.cell_id }}</code> <b>{{ r.temperature }}&deg;</b></li>
       {% endfor %}
     </ul>
 

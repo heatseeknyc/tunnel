@@ -3,8 +3,8 @@
   <body>
     <h1>Hubs</h1>
     <ul>
-      {% for hub in hubs %}
-      <li><a href="{{ url_for('hub', hub_id=hub.hub_id) }}"><code>{{ hub.hub_id }}</code></a> {{ hub.time }}</li>
+      {% for h in hubs %}
+      <li>{{ h.time }} <a href="{{ url_for('hub', hub_id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a></li>
       {% endfor %}
     </ul>
   </body>

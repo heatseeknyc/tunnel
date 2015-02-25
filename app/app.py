@@ -53,13 +53,16 @@ class Hubs(flask.views.MethodView):
 class Hub(flask.views.MethodView):
     def get(self, hub_id):
         cursor = db.cursor()
-        cursor.execute('select distinct on (cell_id) hub_id, cell_id from readings'
-                       ' where hub_id=%s order by cell_id', (hub_id,))
-        cells = cursor.fetchall()
         cursor.execute('select time, port from hubs'
                        ' where hub_id=%s order by time desc', (hub_id,))
         logs = cursor.fetchall()
-        return flask.render_template('hub.html', cells=cells, logs=logs)
+        cursor.execute('select distinct on (cell_id) time, cell_id from readings'
+                       ' where hub_id=%s order by cell_id, time desc', (hub_id,))
+        cells = cursor.fetchall()
+        cursor.execute('select hub_time, cell_id, temperature from readings'
+                       ' where hub_id=%s order by hub_time desc', (hub_id,))
+        readings = cursor.fetchall()
+        return flask.render_template('hub.html', logs=logs, cells=cells, readings=readings)
 
 @route('/readings', 'readings')
 class Readings(flask.views.MethodView):
