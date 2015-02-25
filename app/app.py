@@ -39,10 +39,9 @@ class Index(flask.views.MethodView):
 class Hubs(flask.views.MethodView):
     def get(self):
         cursor = db.cursor()
-        cursor.execute('select distinct on (hub_id) hub_id, time, port'
-                       ' from hubs order by hub_id, time desc')
-        hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
-        return flask.render_template('hubs.html', hubs=hubs)
+        cursor.execute('select hub_id, max(time) as time from hubs'
+                       ' group by hub_id order by time desc')
+        return flask.render_template('hubs.html', hubs=cursor.fetchall())
 
     def post(self):
         db.cursor().execute('insert into hubs (hub_id, port)'
@@ -56,11 +55,11 @@ class Hub(flask.views.MethodView):
         cursor.execute('select time, port from hubs'
                        ' where hub_id=%s order by time desc', (hub_id,))
         logs = cursor.fetchall()
-        cursor.execute('select distinct on (cell_id) time, cell_id from readings'
-                       ' where hub_id=%s order by cell_id, time desc', (hub_id,))
+        cursor.execute('select cell_id, max(time) as time from readings'
+                       ' where hub_id=%s group by cell_id order by time desc', (hub_id,))
         cells = cursor.fetchall()
-        cursor.execute('select hub_time, cell_id, temperature from readings'
-                       ' where hub_id=%s order by hub_time desc', (hub_id,))
+        cursor.execute('select hub_time, cell_id, temperature, relay, relayed_time from readings'
+                       ' where hub_id=%s order by hub_time desc limit 100', (hub_id,))
         readings = cursor.fetchall()
         return flask.render_template('hub.html', logs=logs, cells=cells, readings=readings)
 
