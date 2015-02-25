@@ -4,6 +4,7 @@ create table readings (
     hub_time timestamp not null,
     cell_id text not null
     temperature real not null,
+    relay boolean not null,
     time timestamp not null default now(),
     relayed_time timestamp
 );

@@ -26,7 +26,7 @@ def transmit():
         with db:
             cursor = db.cursor()
             cursor.execute('select * from readings'
-                           ' where relayed_time is null')
+                           ' where relay and relayed_time is null')
             readings = cursor.fetchall()
         if readings: logging.info('{} unrelayed readings'.format(len(readings)))
 

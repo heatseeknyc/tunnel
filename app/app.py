@@ -71,8 +71,9 @@ class Readings(flask.views.MethodView):
     def post(self):
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
-        db.cursor().execute('insert into readings (hub_id, hub_time, cell_id, temperature)'
-                            ' values (%(hub)s, %(time)s, %(cell)s, %(temp)s)', d)
+        d['relay'] = True # TODO this should correspond to whether hub is in live mode
+        db.cursor().execute('insert into readings (hub_id, hub_time, cell_id, temperature, relay)'
+                            ' values (%(hub)s, %(time)s, %(cell)s, %(temp)s, %(relay)s)', d)
         return 'ok'
 
 
