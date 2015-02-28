@@ -63,6 +63,14 @@ class Hub(flask.views.MethodView):
         readings = cursor.fetchall()
         return flask.render_template('hub.html', logs=logs, cells=cells, readings=readings)
 
+@route('/cells/<cell_id>', 'cell')
+class Cell(flask.views.MethodView):
+    def get(self, cell_id):
+        cursor = db.cursor()
+        cursor.execute('select hub_time, cell_id, temperature, relay, relayed_time from readings'
+                       ' where cell_id=%s order by hub_time desc limit 1000', (cell_id,))
+        return flask.render_template('readings.html', readings=cursor.fetchall())
+
 @route('/readings', 'readings')
 class Readings(flask.views.MethodView):
     def get(self):
