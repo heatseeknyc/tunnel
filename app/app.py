@@ -59,7 +59,7 @@ class Hub(flask.views.MethodView):
                        ' where hub_id=%s group by cell_id order by time desc', (hub_id,))
         cells = cursor.fetchall()
         cursor.execute('select hub_time, cell_id, temperature, relay, relayed_time from readings'
-                       ' where hub_id=%s order by hub_time desc limit 100', (hub_id,))
+                       ' where hub_id=%s order by hub_time desc limit 1000', (hub_id,))
         readings = cursor.fetchall()
         return flask.render_template('hub.html', logs=logs, cells=cells, readings=readings)
 
@@ -68,7 +68,7 @@ class Readings(flask.views.MethodView):
     def get(self):
         cursor = db.cursor()
         cursor.execute('select hub_time, hub_id, cell_id, temperature, relay, relayed_time'
-                       ' from readings order by hub_time desc limit 100')
+                       ' from readings order by hub_time desc limit 1000')
         return flask.render_template('readings.html', readings=cursor.fetchall())
 
     def post(self):
