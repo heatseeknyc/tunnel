@@ -39,9 +39,10 @@ class Index(flask.views.MethodView):
 class Hubs(flask.views.MethodView):
     def get(self):
         cursor = db.cursor()
-        cursor.execute('select hub_id, max(time) as time from hubs'
-                       ' group by hub_id order by time desc')
-        return flask.render_template('hubs.html', hubs=cursor.fetchall())
+        cursor.execute('select distinct on (hub_id) hub_id, time, port from hubs'
+                       ' order by hub_id, time desc')
+        hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
+        return flask.render_template('hubs.html', hubs=hubs)
 
     def post(self):
         db.cursor().execute('insert into hubs (hub_id, port)'
@@ -53,7 +54,7 @@ class Hub(flask.views.MethodView):
     def get(self, hub_id):
         cursor = db.cursor()
         cursor.execute('select time, port from hubs'
-                       ' where hub_id=%s order by time desc', (hub_id,))
+                       ' where hub_id=%s order by time desc limit 10', (hub_id,))
         logs = cursor.fetchall()
         cursor.execute('select cell_id, max(time) as time from readings'
                        ' where hub_id=%s group by cell_id order by time desc', (hub_id,))
@@ -67,9 +68,13 @@ class Hub(flask.views.MethodView):
 class Cell(flask.views.MethodView):
     def get(self, cell_id):
         cursor = db.cursor()
-        cursor.execute('select hub_time, cell_id, temperature, relay, relayed_time from readings'
+        cursor.execute('select hub_id, max(time) as time from readings'
+                       ' where cell_id=%s group by hub_id order by time desc', (cell_id,))
+        hubs = cursor.fetchall()
+        cursor.execute('select hub_time, hub_id, temperature, relay, relayed_time from readings'
                        ' where cell_id=%s order by hub_time desc limit 1000', (cell_id,))
-        return flask.render_template('readings.html', readings=cursor.fetchall())
+        readings = cursor.fetchall()
+        return flask.render_template('cell.html', hubs=hubs, readings=readings)
 
 @route('/readings', 'readings')
 class Readings(flask.views.MethodView):

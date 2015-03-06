@@ -1,29 +1,21 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <h2>Status Log</h2>
+    <h2>Hubs</h2>
     <ul>
-      {% for l in logs %}
-      <li>{{ l.time }} <b>{{ l.port }}</b></li>
-      {% endfor %}
-    </ul>
-
-    <h2>Cells</h2>
-    <ul>
-      {% for c in cells %}
-      <li>{{ c.time }} <a href="{{ url_for('cell', cell_id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a></li>
+      {% for h in hubs %}
+      <li>{{ h.time }} <a href="{{ url_for('hub', hub_id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a></li>
       {% endfor %}
     </ul>
 
     <h2>Readings</h2>
     <ul>
       {% for r in readings %}
-      <li>{{ r.hub_time }} <code>{{ r.cell_id }}</code>
+      <li>{{ r.hub_time }} <code>{{ r.hub_id }}</code> <code>{{ r.cell_id }}</code>
 	{% if r.relay %}<b>{{ r.temperature }}&deg;</b>{% if r.relayed_time %} (relayed at {{ r.relayed_time }}){% endif %}
 	{% else %}<s>{{ r.temperature }}</s>{% endif %}
       </li>
       {% endfor %}
     </ul>
-
   </body>
 </html>
