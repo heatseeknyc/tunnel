@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging; logging.basicConfig(level=logging.INFO)
 import operator
+import subprocess
 
 import flask
 import flask.views
@@ -14,7 +15,6 @@ db = psycopg2.connect(host='localhost', user='webdb', password='password',
 
 @app.teardown_request
 def teardown_request(exception):
-    logging.info('sup')
     if exception:
         db.rollback()
         logging.error(exception)
@@ -63,6 +63,18 @@ class Hub(flask.views.MethodView):
                        ' where hub_id=%s order by hub_time desc limit 1000', (hub_id,))
         readings = cursor.fetchall()
         return flask.render_template('hub.html', logs=logs, cells=cells, readings=readings)
+
+    def patch(self, hub_id):
+        # TODO actually look at the data, which should be something like hourly=true...
+        cursor = db.cursor()
+        cursor.execute('select port from hubs where hub_id=%s'
+                       ' order by time desc limit 1', (hub_id,))
+        row = cursor.fetchone()
+        if not row: return 'no ssh port for hub', 404
+
+        logging.info(subprocess.check_output(['ssh', '-p', str(row['port']), 'localhost',
+                                              'cd firmware && sudo python3 -m hub.hourly']))
+        return 'ok'
 
 @route('/cells/<cell_id>', 'cell')
 class Cell(flask.views.MethodView):
