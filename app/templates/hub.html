@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% block head %}<script src="/static/hub.js"></script>{% endblock %}
 {% block title %}Hub {{ request.view_args.hub_id }}{% endblock %}
 {% block body %}
 <h2>Status Log</h2>
@@ -28,3 +27,4 @@
 
 <button id="hourly">Switch to Hourly Readings</button>
 {% endblock %}
+{% block js %}<script src="/static/hub.js"></script>{% endblock %}
