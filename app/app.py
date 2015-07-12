@@ -13,6 +13,7 @@ app = flask.Flask(__name__)
 db = psycopg2.connect(host='localhost', user='webdb', password='password',
                       cursor_factory=psycopg2.extras.DictCursor)
 
+
 @app.teardown_request
 def teardown_request(exception):
     if exception:
@@ -20,6 +21,7 @@ def teardown_request(exception):
         logging.error(exception)
     else:
         db.commit()
+
 
 def route(path, name):
     """decorator to add a route to a View class"""
@@ -31,27 +33,32 @@ def route(path, name):
 
 @route('/', 'index')
 class Index(flask.views.MethodView):
-    def get(self):
+    @staticmethod
+    def get():
         return 'Hello, cruel world!'
 
 
 @route('/hubs', 'hubs')
 class Hubs(flask.views.MethodView):
-    def get(self):
+    @staticmethod
+    def get():
         cursor = db.cursor()
         cursor.execute('select distinct on (hub_id) hub_id, time, port from hubs'
                        ' order by hub_id, time desc')
         hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
         return flask.render_template('hubs.html', hubs=hubs)
 
-    def post(self):
+    @staticmethod
+    def post():
         db.cursor().execute('insert into hubs (hub_id, port)'
                             ' values (%(hub)s, %(port)s)', flask.request.form)
         return 'ok'
 
+
 @route('/hubs/<hub_id>', 'hub')
 class Hub(flask.views.MethodView):
-    def get(self, hub_id):
+    @staticmethod
+    def get(hub_id):
         cursor = db.cursor()
         cursor.execute('select time, port from hubs'
                        ' where hub_id=%s order by time desc limit 10', (hub_id,))
@@ -64,7 +71,8 @@ class Hub(flask.views.MethodView):
         readings = cursor.fetchall()
         return flask.render_template('hub.html', logs=logs, cells=cells, readings=readings)
 
-    def patch(self, hub_id):
+    @staticmethod
+    def patch(hub_id):
         # TODO actually look at the data, which should be something like hourly=true...
         cursor = db.cursor()
         cursor.execute('select port from hubs where hub_id=%s'
@@ -76,9 +84,11 @@ class Hub(flask.views.MethodView):
                                               'cd firmware && sudo python3 -m hub.hourly']))
         return 'ok'
 
+
 @route('/cells/<cell_id>', 'cell')
 class Cell(flask.views.MethodView):
-    def get(self, cell_id):
+    @staticmethod
+    def get(cell_id):
         cursor = db.cursor()
         cursor.execute('select hub_id, max(time) as time from readings'
                        ' where cell_id=%s group by hub_id order by time desc', (cell_id,))
@@ -88,15 +98,18 @@ class Cell(flask.views.MethodView):
         readings = cursor.fetchall()
         return flask.render_template('cell.html', hubs=hubs, readings=readings)
 
+
 @route('/readings', 'readings')
 class Readings(flask.views.MethodView):
-    def get(self):
+    @staticmethod
+    def get():
         cursor = db.cursor()
         cursor.execute('select hub_time, hub_id, cell_id, temperature, relay, relayed_time'
                        ' from readings order by hub_time desc limit 1000')
         return flask.render_template('readings.html', readings=cursor.fetchall())
 
-    def post(self):
+    @staticmethod
+    def post():
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
         d['relay'] = True # TODO this should correspond to whether hub is in live mode
