@@ -112,9 +112,17 @@ class Readings(flask.views.MethodView):
     def post():
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
-        d['relay'] = True # TODO this should correspond to whether hub is in live mode
-        db.cursor().execute('insert into readings (hub_id, hub_time, cell_id, temperature, relay)'
-                            ' values (%(hub)s, %(time)s, %(cell)s, %(temp)s, %(relay)s)', d)
+        d['relay'] = True  # TODO this should correspond to whether hub is in live mode
+        cursor = db.cursor()
+
+        cursor.execute('select count(*) from readings where'
+                       ' cell_id=%(cell)s and hub_time=%(time)s and temperature=%(temp)s', d)
+        count, = cursor.fetchone()
+        if count:  # duplicate reading, store but don't relay
+            d['relay'] = False
+
+        cursor.execute('insert into readings (hub_id, hub_time, cell_id, temperature, relay)'
+                       ' values (%(hub)s, %(time)s, %(cell)s, %(temp)s, %(relay)s)', d)
         return 'ok'
 
 
