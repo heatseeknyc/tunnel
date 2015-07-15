@@ -8,8 +8,8 @@ create table readings (
     time timestamp not null default now(),
     relayed_time timestamp
 );
-create index on readings (hub_id, hub_time desc);
-create index on readings (cell_id, hub_time desc);
+create index on readings (hub_id, time desc);
+create index on readings (cell_id, time desc);
 
 create table hubs (
     id text primary key,
@@ -27,3 +27,4 @@ create table hubs_log (
     time timestamp not null default now()
 );
 create index on hubs_log (hub_id, time desc);
+create index on hubs_log (xbee_id, time desc);
