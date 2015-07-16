@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Heat Seek Setup{% endblock %}
+{% block body %}
+<label for="xbee_id">Hub's XBee ID:</label>
+<input type="text" id="xbee_id">
+<button id="go">Go</button>
+{% endblock %}
+{% block js %}
+<script>HUBS_URL = '{{ url_for('hubs') }}';</script>
+<script src="/static/index.js"></script>
+{% endblock %}

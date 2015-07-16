@@ -35,7 +35,7 @@ def route(path, name):
 class Index(flask.views.MethodView):
     @staticmethod
     def get():
-        return 'Hello, cruel world!'
+        return flask.render_template('index.html')
 
 
 @route('/hubs', 'hubs')
