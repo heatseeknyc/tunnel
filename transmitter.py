@@ -1,4 +1,4 @@
-"""Continually transmit readings from database to heatseeknyc.com."""
+"""Continually transmit temperatures from database to heatseeknyc.com."""
 
 import logging
 import time
@@ -11,14 +11,15 @@ import requests
 logging.basicConfig(level=logging.INFO)
 
 
-def transmit_reading(reading):
-    """Transmit a single reading to heatseeknyc.com."""
-    reading = dict(sensor_name=reading['cell_id'],
-                   temp=reading['temperature'],
-                   time=reading['hub_time'].timestamp(),
-                   verification='c0ffee')
-    logging.info('POSTing {}...'.format(reading))
-    response = requests.post('http://heatseeknyc.com/readings.json', json=dict(reading=reading))
+def transmit_temperature(temperature):
+    """Transmit a single temperature to heatseeknyc.com."""
+    temperature = dict(sensor_name=temperature['cell_id'],
+                       temp=temperature['temperature'],
+                       time=temperature['hub_time'].timestamp(),
+                       verification='c0ffee')
+    logging.info('POSTing {}...'.format(temperature))
+    response = requests.post('http://heatseeknyc.com/temperatures.json',
+                             json=dict(temperature=temperature))
     if response.status_code == 200:
         return True
     else:
@@ -28,25 +29,25 @@ def transmit_reading(reading):
 
 
 def transmit():
-    """Continually transmit readings from database to heatseeknyc.com."""
+    """Continually transmit temperatures from database to heatseeknyc.com."""
     database = psycopg2.connect(host='localhost', user='webdb', password='password',
                                 cursor_factory=psycopg2.extras.DictCursor)
     while True:
         with database:
             cursor = database.cursor()
-            cursor.execute('select * from readings'
+            cursor.execute('select * from temperatures'
                            ' where relay and relayed_time is null')
-            readings = cursor.fetchall()
-        if readings: logging.info('%s unrelayed readings', len(readings))
+            temperatures = cursor.fetchall()
+        if temperatures: logging.info('%s unrelayed temperatures', len(temperatures))
 
         failed_cell_ids = set()
-        for reading in readings:
-            cell_id = reading['cell_id']
+        for temperature in temperatures:
+            cell_id = temperature['cell_id']
             if cell_id not in failed_cell_ids:
-                if transmit_reading(reading):
+                if transmit_temperature(temperature):
                     with database:
-                        database.cursor().execute('update readings set relayed_time = now()'
-                                                  ' where id=%(id)s', reading)
+                        database.cursor().execute('update temperatures set relayed_time = now()'
+                                                  ' where id=%(id)s', temperature)
                 else:
                     failed_cell_ids.add(cell_id)
                 time.sleep(1)
