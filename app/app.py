@@ -51,8 +51,8 @@ class Hubs(flask.views.MethodView):
 
     @staticmethod
     def post():
-        db.cursor().execute('insert into hubs (hub_id, pi_id, port)'
-                            ' values (%(hub)s, %(pi)s, %(port)s)', flask.request.form)
+        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
+                            ' values (%(hub)s, %(pi)s, $(sp)s, %(port)s)', flask.request.form)
         return 'ok'
 
 
@@ -113,7 +113,8 @@ class Temperatures(flask.views.MethodView):
     def post():
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
-        d['relay'] = True  # TODO this should correspond to whether hub is in live mode
+        d['relay'] = d['sp'] == (60*60 - 10) * 100  # 59m50s, the "live" SP setting
+
         cursor = db.cursor()
 
         cursor.execute('select count(*) from temperatures where'
@@ -122,8 +123,8 @@ class Temperatures(flask.views.MethodView):
         if count:  # duplicate reading, store but don't relay
             d['relay'] = False  # TODO fix hub transmitter instead
 
-        cursor.execute('insert into temperatures (hub_id, cell_id, temperature, relay, hub_time)'
-                       ' values (%(hub)s, %(cell)s, %(temp)s, %(relay)s, %(time)s)', d)
+        cursor.execute('insert into temperatures (hub_id, cell_id, temperature, sleep_period, relay, hub_time)'
+                       ' values (%(hub)s, %(cell)s, %(temp)s, %(sp)s, %(relay)s, %(time)s)', d)
         return 'ok'
 
 

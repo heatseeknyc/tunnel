@@ -3,6 +3,7 @@ create table temperatures (
     hub_id text not null check (hub_id != ''),
     cell_id text not null check (cell_id != ''),
     temperature real not null,
+    sleep_period integer not null,
     relay boolean not null,
     hub_time timestamp not null,
     time timestamp not null default now(),
@@ -15,6 +16,7 @@ create table hubs (
     id serial primary key,
     hub_id text not null check (hub_id != ''),
     pi_id text not null check (pi_id != ''),
+    sleep_period integer not null,
     port integer,
     time timestamp not null default now()
 );
