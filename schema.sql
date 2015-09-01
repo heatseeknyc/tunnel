@@ -1,7 +1,7 @@
 create table temperatures (
     id serial primary key,
-    hub_id text not null,
-    cell_id text not null,
+    hub_id text not null check (hub_id != ''),
+    cell_id text not null check (cell_id != ''),
     temperature real not null,
     relay boolean not null,
     hub_time timestamp not null,
@@ -13,8 +13,8 @@ create index on temperatures (cell_id, time desc);
 
 create table hubs (
     id serial primary key,
-    hub_id text not null,
-    pi_id text not null,
+    hub_id text not null check (hub_id != ''),
+    pi_id text not null check (pi_id != ''),
     port integer,
     time timestamp not null default now()
 );
