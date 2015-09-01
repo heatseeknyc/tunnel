@@ -51,8 +51,11 @@ class Hubs(flask.views.MethodView):
 
     @staticmethod
     def post():
+        d = flask.request.form.copy()
+        if not d.get('port'): d['port'] = None  # missing or empty => null
+
         db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
-                            ' values (%(hub)s, %(pi)s, $(sp)s, %(port)s)', flask.request.form)
+                            ' values (%(hub)s, %(pi)s, $(sp)s, %(port)s)', d)
         return 'ok'
 
 
