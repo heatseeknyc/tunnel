@@ -55,7 +55,7 @@ class Hubs(flask.views.MethodView):
         if not d.get('port'): d['port'] = None  # missing or empty => null
 
         db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
-                            ' values (%(hub)s, %(pi)s, $(sp)s, %(port)s)', d)
+                            ' values (%(hub)s, %(pi)s, %(sp)s, %(port)s)', d)
         return 'ok'
 
 
