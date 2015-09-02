@@ -8,6 +8,9 @@ import psycopg2
 import psycopg2.extras
 
 
+LIVE_SLEEP_PERIOD = (59*60 + 50) * 100  # 59m50s in centiseconds
+
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -84,8 +87,10 @@ class Hub(flask.views.MethodView):
         row = cursor.fetchone()
         if not row: return 'no ssh port for hub', 404
 
-        logging.info(subprocess.check_output(['ssh', '-p', str(row['port']), 'localhost',
-                                              'cd firmware && sudo python3 -m hub.hourly']))
+        logging.info(subprocess.check_output([
+            'ssh', '-p', str(row['port']), 'localhost',
+            'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(LIVE_SLEEP_PERIOD)
+        ]))
         return 'ok'
 
 
@@ -116,7 +121,7 @@ class Temperatures(flask.views.MethodView):
     def post():
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
-        d['relay'] = d['sp'] == (60*60 - 10) * 100  # 59m50s, the "live" SP setting
+        d['relay'] = d['sp'] == LIVE_SLEEP_PERIOD
 
         cursor = db.cursor()
 
