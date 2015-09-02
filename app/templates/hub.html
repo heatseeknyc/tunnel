@@ -3,7 +3,7 @@
 {% block title %}Hub {{ request.view_args.id }}{% endblock %}
 
 {% block body %}
-<h2>Settings</h2>
+<h2>Status</h2>
 <ul>
   {% for l in logs %}
   <li>{{ l.time }} <code>{{ l.pi_id }}</code> <i>{{ l.sleep_period }}</i> <b>{{ l.port }}</b></li>
