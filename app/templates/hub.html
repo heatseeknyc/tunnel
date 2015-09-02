@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+
 {% block title %}Hub {{ request.view_args.id }}{% endblock %}
+
 {% block body %}
-<h2>Status Log</h2>
+<h2>Settings</h2>
 <ul>
   {% for l in logs %}
-  <li>{{ l.time }} <i>{{ l.pi_id }}</i> <b>{{ l.port }}</b></li>
+  <li>{{ l.time }} <code>{{ l.pi_id }}</code> <i>{{ t.sleep_period }}</i> <b>{{ l.port }}</b></li>
   {% endfor %}
 </ul>
 
@@ -15,16 +17,10 @@
   {% endfor %}
 </ul>
 
-<h2 id="readings">Readings</h2>
-<ul>
-  {% for t in temperatures %}
-  <li>{{ t.hub_time }} <code>{{ t.cell_id }}</code>
-    {% if t.relay %}<b>{{ t.temperature }}&deg;</b>{% if t.relayed_time %} (relayed at {{ t.relayed_time }}){% endif %}
-    {% else %}<s>{{ t.temperature }}</s>{% endif %}
-  </li>
-  {% endfor %}
-</ul>
+<h2 id="temperatures">Temperatures</h2>
+{% include 'temperatures_ul.html' %}
 
 <button id="hourly">Switch to Hourly Readings</button>
 {% endblock %}
+
 {% block js %}<script src="/static/hub.js"></script>{% endblock %}

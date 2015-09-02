@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Hubs{% endblock %}
 {% block body %}
-<h1>Hubs</h1>
 <ul>
   {% for h in hubs %}
   <li>{{ h.time }} <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a></li>

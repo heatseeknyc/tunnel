@@ -67,13 +67,13 @@ class Hub(flask.views.MethodView):
     @staticmethod
     def get(id):
         cursor = db.cursor()
-        cursor.execute('select pi_id, port, time from hubs'
+        cursor.execute('select pi_id, sleep_period, port, time from hubs'
                        ' where hub_id=%s order by time desc limit 10', (id,))
         logs = cursor.fetchall()
         cursor.execute('select cell_id, max(time) as time from temperatures'
                        ' where hub_id=%s group by cell_id order by time desc', (id,))
         cells = cursor.fetchall()
-        cursor.execute('select cell_id, temperature, relay, hub_time, relayed_time from temperatures'
+        cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where hub_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
         return flask.render_template('hub.html', logs=logs, cells=cells, temperatures=temperatures)
@@ -102,7 +102,7 @@ class Cell(flask.views.MethodView):
         cursor.execute('select hub_id, max(time) as time from temperatures'
                        ' where cell_id=%s group by hub_id order by time desc', (id,))
         hubs = cursor.fetchall()
-        cursor.execute('select hub_id, temperature, relay, hub_time, relayed_time from temperatures'
+        cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where cell_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
         return flask.render_template('cell.html', hubs=hubs, temperatures=temperatures)
@@ -113,7 +113,7 @@ class Temperatures(flask.views.MethodView):
     @staticmethod
     def get():
         cursor = db.cursor()
-        cursor.execute('select hub_id, cell_id, temperature, relay, hub_time, relayed_time'
+        cursor.execute('select hub_id, cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
                        ' from temperatures order by hub_time desc limit 100')
         return flask.render_template('temperatures.html', temperatures=cursor.fetchall())
 

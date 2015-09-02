@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block title %}Cell {{ request.view_args.id }}{% endblock %}
+
 {% block body %}
 <h2>Hubs</h2>
 <ul>
@@ -8,13 +10,6 @@
   {% endfor %}
 </ul>
 
-<h2 id="readings">Readings</h2>
-<ul>
-  {% for t in temperatures %}
-  <li>{{ t.hub_time }} <code>{{ t.hub_id }}</code> <code>{{ t.cell_id }}</code>
-    {% if t.relay %}<b>{{ t.temperature }}&deg;</b>{% if t.relayed_time %} (relayed at {{ t.relayed_time }}){% endif %}
-    {% else %}<s>{{ t.temperature }}</s>{% endif %}
-  </li>
-  {% endfor %}
-</ul>
+<h2 id="temperatures">Temperatures</h2>
+{% include 'temperatures_ul.html' %}
 {% endblock %}
