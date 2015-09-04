@@ -13,13 +13,13 @@ logging.basicConfig(level=logging.INFO)
 
 def transmit_temperature(temperature):
     """Transmit a single temperature to heatseeknyc.com."""
-    temperature = dict(sensor_name=temperature['cell_id'],
-                       temp=temperature['temperature'],
-                       time=temperature['hub_time'].timestamp(),
-                       verification='c0ffee')
-    logging.info('POSTing {}...'.format(temperature))
-    response = requests.post('http://heatseeknyc.com/temperatures.json',
-                             json=dict(temperature=temperature))
+    reading = dict(sensor_name=temperature['cell_id'],
+                   temp=temperature['temperature'],
+                   time=temperature['hub_time'].timestamp(),
+                   verification='c0ffee')
+    logging.info('POSTing {}...'.format(reading))
+    response = requests.post('http://heatseeknyc.com/readings.json',
+                             json=dict(reading=reading))
     if response.status_code == 200:
         return True
     else:
