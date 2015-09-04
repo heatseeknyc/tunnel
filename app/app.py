@@ -121,7 +121,7 @@ class Temperatures(flask.views.MethodView):
     def post():
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
-        d['relay'] = d['sp'] == LIVE_SLEEP_PERIOD
+        d['relay'] = int(d['sp']) == LIVE_SLEEP_PERIOD
 
         cursor = db.cursor()
 
