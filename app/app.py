@@ -56,7 +56,6 @@ class Hubs(flask.views.MethodView):
     def post():
         d = flask.request.form.copy()
         if not d.get('port'): d['port'] = None  # missing or empty => null
-
         db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
                             ' values (%(hub)s, %(pi)s, %(sp)s, %(port)s)', d)
         return 'ok'
@@ -122,20 +121,8 @@ class Temperatures(flask.views.MethodView):
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
         d['relay'] = int(d['sp']) == LIVE_SLEEP_PERIOD
-
-        cursor = db.cursor()
-
-        cursor.execute('select count(*) from temperatures where'
-                       ' cell_id=%(cell)s and hub_time=%(time)s', d)
-        count, = cursor.fetchone()
-        if count:  # duplicate reading, store but don't relay
-            # TODO fix hub transmitter instead
-            logging.warn('there are already %d readings with cell_id=%s and hub_time=%s',
-                         count, d['cell'], d['time'])
-            d['relay'] = False
-
-        cursor.execute('insert into temperatures (hub_id, cell_id, temperature, sleep_period, relay, hub_time)'
-                       ' values (%(hub)s, %(cell)s, %(temp)s, %(sp)s, %(relay)s, %(time)s)', d)
+        db.cursor().execute('insert into temperatures (hub_id, cell_id, temperature, sleep_period, relay, hub_time)'
+                            ' values (%(hub)s, %(cell)s, %(temp)s, %(sp)s, %(relay)s, %(time)s)', d)
         return 'ok'
 
 
