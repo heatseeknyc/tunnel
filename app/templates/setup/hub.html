@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Hub {{ request.view_args.id }}{% endblock %}
+{% block title %}Hub {{ request.view_args.id|upper }}{% endblock %}
 
 {% block body %}
-<h2>Hub</h2>
+<h2>Hub {{ request.view_args.id|upper }}</h2>
 {% if hub %}
 <p>Last seen {{ hub.time }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.</p>
 {% else %}
@@ -13,7 +13,7 @@
 <h2>Cells</h2>
 <ul>
   {% for c in cells %}
-  <li><code>{% if c.short_id %}{{ c.short_id }}{% else %}{{ c.cell_id }}{% endif %}</code> last seen {{ c.time }}.</li>
+  <li><code>{% if c.short_id %}{{ c.short_id|upper }}{% else %}{{ c.cell_id }}{% endif %}</code> last seen {{ c.time }}.</li>
   {% endfor %}
 </ul>
 
