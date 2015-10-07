@@ -21,3 +21,8 @@ create table hubs (
     time timestamp not null default now()
 );
 create index on hubs (hub_id, time desc);
+
+create table xbees (
+    id text unique not null,
+    short_id text unique not null
+);
