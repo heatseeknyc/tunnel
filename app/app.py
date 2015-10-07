@@ -36,6 +36,14 @@ def route(path, name):
     return f
 
 
+def time_since(then):
+    since = datetime.now() - then
+    if since.days: return '{} days ago'.format(since.days)
+    if since.seconds >= 60 * 60: return '{} hours ago'.format(round(since.seconds / 60 / 60))
+    if since.seconds >= 60: return '{} minutes ago'.format(round(since.seconds / 60))
+    if since.seconds >= 2: return '{} seconds ago'.format(since.seconds)
+    return 'just now'
+
 @route('/', 'setup-index')
 class Index(flask.views.MethodView):
     @staticmethod
@@ -60,14 +68,21 @@ class Hub(flask.views.MethodView):
             if not row: return 'no such id', 404
             hub_id = row['id']
 
-        cursor.execute('select pi_id, sleep_period, port, time from hubs'
-                       ' where hub_id=%s order by time desc limit 10', (hub_id,))
-        logs = cursor.fetchall()
+        cursor.execute('select sleep_period, time from hubs where hub_id=%s'
+                       ' order by time desc limit 1', (hub_id,))
+        hub = cursor.fetchone()
+        if hub:
+            hub['live'] = hub['sleep_period'] == LIVE_SLEEP_PERIOD
+            hub['time'] = time_since(hub['time'])
+
         cursor.execute('select cell_id, short_id, max(time) as time'
                        ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
                        ' group by cell_id, short_id order by time desc', (hub_id,))
         cells = cursor.fetchall()
-        return flask.render_template('setup/hub.html', logs=logs, cells=cells)
+        for cell in cells:
+            cell['time'] = time_since(cell['time'])
+
+        return flask.render_template('setup/hub.html', hub=hub, cells=cells)
 
     @staticmethod
     def patch(id):
