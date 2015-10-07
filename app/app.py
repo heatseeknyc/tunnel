@@ -48,10 +48,17 @@ class Hub(flask.views.MethodView):
     @staticmethod
     def get(id):
         cursor = db.cursor()
-        cursor.execute('select id from xbees where short_id=%s', (id,))
-        row = cursor.fetchone()
-        if not row: return 'no such id', 404
-        hub_id = row['id']
+
+        if len(id) == 16:
+            cursor.execute('select short_id from xbees where id=%s', (id,))
+            row = cursor.fetchone()
+            if row: return flask.redirect(flask.url_for('setup-hub', id=row['short_id']))
+            hub_id = id
+        else:
+            cursor.execute('select id from xbees where short_id=%s', (id,))
+            row = cursor.fetchone()
+            if not row: return 'no such id', 404
+            hub_id = row['id']
 
         cursor.execute('select pi_id, sleep_period, port, time from hubs'
                        ' where hub_id=%s order by time desc limit 10', (hub_id,))
