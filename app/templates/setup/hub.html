@@ -13,7 +13,7 @@
 <h2>Cells</h2>
 <ul>
   {% for c in cells %}
-  <li>{{ c.time }} <code>{{ c.cell_id }}</code></li>
+  <li>{{ c.time }} <code>{% if c.short_id %}{{ c.short_id }}{% else %}{{ c.cell_id }}{% endif %}</code></li>
   {% endfor %}
 </ul>
 
