@@ -72,8 +72,8 @@ class Hub(flask.views.MethodView):
                        ' order by time desc limit 1', (hub_id,))
         hub = cursor.fetchone()
         if hub:
-            hub['live'] = hub['sleep_period'] == LIVE_SLEEP_PERIOD
-            hub['time'] = time_since(hub['time'])
+            hub = dict(live=hub['sleep_period'] == LIVE_SLEEP_PERIOD,
+                       time=time_since(hub['time']))
 
         cursor.execute('select cell_id, short_id, max(time) as time'
                        ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
