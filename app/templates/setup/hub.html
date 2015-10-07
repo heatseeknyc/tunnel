@@ -3,7 +3,8 @@
 {% block title %}Hub {{ request.view_args.id|upper }}{% endblock %}
 
 {% block body %}
-<h2>Hub {{ request.view_args.id|upper }}</h2>
+<h1>Hub {{ request.view_args.id|upper }}</h1>
+
 {% if hub %}
 <p>Last seen {{ hub.time }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.</p>
 {% else %}
