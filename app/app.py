@@ -49,10 +49,10 @@ class Hub(flask.views.MethodView):
     def get(id):
         cursor = db.cursor()
         cursor.execute('select pi_id, sleep_period, port, time from hubs'
-                       ' where hub_id=%s order by time desc limit 10', (hub_id,))
+                       ' where hub_id=%s order by time desc limit 10', (id,))
         logs = cursor.fetchall()
         cursor.execute('select cell_id, max(time) as time from temperatures'
-                       ' where hub_id=%s group by cell_id order by time desc', (hub_id,))
+                       ' where hub_id=%s group by cell_id order by time desc', (id,))
         cells = cursor.fetchall()
         return flask.render_template('setup/hub.html', logs=logs, cells=cells)
 
