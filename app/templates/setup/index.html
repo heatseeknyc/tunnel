@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Heat Seek Setup{% endblock %}
 {% block body %}
-<label for="xbee_id">Hub's XBee ID:</label>
-<input type="text" id="xbee_id">
-<button id="go">Go</button>
+<form id="form">
+  <label for="xbee_id">Hub's 4-Character ID:</label>
+  <input type="text" id="xbee_id">
+  <button type="submit">Get Started</button>
+</form>
 {% endblock %}
 {% block js %}
 <script src="/static/setup/index.js"></script>
