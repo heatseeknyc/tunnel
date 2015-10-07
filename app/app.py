@@ -36,46 +36,25 @@ def route(path, name):
     return f
 
 
-@route('/', 'index')
+@route('/', 'setup-index')
 class Index(flask.views.MethodView):
     @staticmethod
     def get():
-        return flask.render_template('index.html')
+        return flask.render_template('setup/index.html')
 
 
-@route('/hubs', 'hubs')
-class Hubs(flask.views.MethodView):
-    @staticmethod
-    def get():
-        cursor = db.cursor()
-        cursor.execute('select hub_id, max(time) as time from hubs'
-                       ' group by hub_id order by time desc')
-        return flask.render_template('hubs.html', hubs=cursor.fetchall())
-
-    @staticmethod
-    def post():
-        d = flask.request.form.copy()
-        if not d.get('port'): d['port'] = None  # missing or empty => null
-        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
-                            ' values (%(hub)s, %(pi)s, %(sp)s, %(port)s)', d)
-        return 'ok'
-
-
-@route('/hubs/<id>', 'hub')
+@route('/<id>', 'setup-hub')
 class Hub(flask.views.MethodView):
     @staticmethod
     def get(id):
         cursor = db.cursor()
         cursor.execute('select pi_id, sleep_period, port, time from hubs'
-                       ' where hub_id=%s order by time desc limit 10', (id,))
+                       ' where hub_id=%s order by time desc limit 10', (hub_id,))
         logs = cursor.fetchall()
         cursor.execute('select cell_id, max(time) as time from temperatures'
-                       ' where hub_id=%s group by cell_id order by time desc', (id,))
+                       ' where hub_id=%s group by cell_id order by time desc', (hub_id,))
         cells = cursor.fetchall()
-        cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
-                       ' where hub_id=%s order by hub_time desc limit 100', (id,))
-        temperatures = cursor.fetchall()
-        return flask.render_template('hub.html', logs=logs, cells=cells, temperatures=temperatures)
+        return flask.render_template('setup/hub.html', logs=logs, cells=cells)
 
     @staticmethod
     def patch(id):
@@ -93,7 +72,42 @@ class Hub(flask.views.MethodView):
         return 'ok'
 
 
-@route('/cells/<id>', 'cell')
+@route('/hubs', 'relay-hubs')
+class Hubs(flask.views.MethodView):
+    @staticmethod
+    def get():
+        cursor = db.cursor()
+        cursor.execute('select hub_id, max(time) as time from hubs'
+                       ' group by hub_id order by time desc')
+        return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
+
+    @staticmethod
+    def post():
+        d = flask.request.form.copy()
+        if not d.get('port'): d['port'] = None  # missing or empty => null
+        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
+                            ' values (%(hub)s, %(pi)s, %(sp)s, %(port)s)', d)
+        return 'ok'
+
+
+@route('/hubs/<id>', 'relay-hub')
+class Hub(flask.views.MethodView):
+    @staticmethod
+    def get(id):
+        cursor = db.cursor()
+        cursor.execute('select pi_id, sleep_period, port, time from hubs'
+                       ' where hub_id=%s order by time desc limit 10', (id,))
+        logs = cursor.fetchall()
+        cursor.execute('select cell_id, max(time) as time from temperatures'
+                       ' where hub_id=%s group by cell_id order by time desc', (id,))
+        cells = cursor.fetchall()
+        cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
+                       ' where hub_id=%s order by hub_time desc limit 100', (id,))
+        temperatures = cursor.fetchall()
+        return flask.render_template('relay/hub.html', logs=logs, cells=cells, temperatures=temperatures)
+
+
+@route('/cells/<id>', 'relay-cell')
 class Cell(flask.views.MethodView):
     @staticmethod
     def get(id):
@@ -104,17 +118,17 @@ class Cell(flask.views.MethodView):
         cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where cell_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
-        return flask.render_template('cell.html', hubs=hubs, temperatures=temperatures)
+        return flask.render_template('relay/cell.html', hubs=hubs, temperatures=temperatures)
 
 
-@route('/temperatures', 'temperatures')
+@route('/temperatures', 'relay-temperatures')
 class Temperatures(flask.views.MethodView):
     @staticmethod
     def get():
         cursor = db.cursor()
         cursor.execute('select hub_id, cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
                        ' from temperatures order by hub_time desc limit 100')
-        return flask.render_template('temperatures.html', temperatures=cursor.fetchall())
+        return flask.render_template('relay/temperatures.html', temperatures=cursor.fetchall())
 
     @staticmethod
     def post():

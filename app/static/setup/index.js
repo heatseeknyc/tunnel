@@ -1,5 +1,5 @@
 $(function() {
     $('#go').click(function() {
-	location = HUBS_URL + '/' + $('#xbee_id').val();
+	location = '/' + $('#xbee_id').val().toLowerCase();
     });
 });

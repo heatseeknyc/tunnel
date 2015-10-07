@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Hub {{ request.view_args.id }}{% endblock %}
+
+{% block body %}
+<h2>Status</h2>
+<ul>
+  {% for l in logs %}
+  <li>{{ l.time }} <code>{{ l.pi_id }}</code> <i>{{ l.sleep_period }}</i> <b>{{ l.port }}</b></li>
+  {% endfor %}
+</ul>
+
+<h2>Cells</h2>
+<ul>
+  {% for c in cells %}
+  <li>{{ c.time }} <a href="{{ url_for('relay-cell', id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a></li>
+  {% endfor %}
+</ul>
+
+<h2 id="temperatures">Temperatures</h2>
+{% include 'relay/temperatures_ul.html' %}
+{% endblock %}
