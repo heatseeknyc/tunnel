@@ -77,12 +77,11 @@ class Hub(flask.views.MethodView):
                        since=time_since(hub['time']))
 
         # select most recent row for each cell of this hub, and join on short id:
-        cursor.execute('select distinct on (cell_id) cell_id, short_id, sleep_period, time'
+        cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
                        ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
                        ' order by cell_id, time desc', (hub_id,))
         cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
         cells = [dict(id=c['short_id'] or c['cell_id'],
-                      live=c['sleep_period'] == LIVE_SLEEP_PERIOD,
                       since=time_since(c['time']))
                  for c in cells]
 
