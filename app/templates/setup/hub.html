@@ -3,21 +3,23 @@
 {% block title %}Hub {{ request.view_args.id|upper }}{% endblock %}
 
 {% block body %}
-<p>Hub <code>{{ request.view_args.id|upper }}</code>
+<h1>Hub <code>{{ request.view_args.id|upper }}</code></h1>
+<p>
   {% if hub %}
-  last seen {{ hub.since }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.
+  Last seen {{ hub.since }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.
   {% else %}
-  not yet seen.
+  Not yet seen.
   {% endif %}
 </p>
 
+<h2>Cells</h2>
 <ul>
   {% for c in cells %}
-  <li>Cell <code>{{ c.id }}</code> last seen {{ c.since }}, during {% if hub.live %}live{% else %}setup{% endif %} mode.</p></li>
+  <li><code>{{ c.id }}</code> last seen {{ c.since }}, during {% if hub.live %}live{% else %}setup{% endif %} mode.</p></li>
   {% endfor %}
 </ul>
 
-<button id="hourly">Switch to Hourly Readings</button>
+<p><button id="hourly">Switch to Hourly Readings</button></p>
 {% endblock %}
 
 {% block js %}<script src="/static/setup/hub.js"></script>{% endblock %}
