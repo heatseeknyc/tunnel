@@ -111,7 +111,12 @@ class Hub(flask.views.MethodView):
         return 'ok'
 
 
-@route('/hubs', 'relay-hubs')
+# old hub firmware doesn't use a trailing slash:
+@app.route('/hubs', methods=['POST'])
+def old_hubs_post():
+    return Hubs.post()
+
+@route('/hubs/', 'relay-hubs')
 class Hubs(flask.views.MethodView):
     @staticmethod
     def get():
@@ -160,7 +165,12 @@ class Cell(flask.views.MethodView):
         return flask.render_template('relay/cell.html', hubs=hubs, temperatures=temperatures)
 
 
-@route('/temperatures', 'relay-temperatures')
+# old hub firmware doesn't use a trailing slash:
+@app.route('/temperatures', methods=['POST'])
+def old_temperatures_post():
+    return Temperatures.post()
+
+@route('/temperatures/', 'relay-temperatures')
 class Temperatures(flask.views.MethodView):
     @staticmethod
     def get():
