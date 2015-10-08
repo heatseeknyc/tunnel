@@ -15,7 +15,7 @@
 <h2>Cells</h2>
 <ul>
   {% for c in cells %}
-  <li><code>{{ c.id }}</code> last seen {{ c.since }}.</p></li>
+  <li><code>{{ c.id|upper }}</code> last seen {{ c.since }}.</p></li>
   {% endfor %}
 </ul>
 
