@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+import operator
 import subprocess
 
 import flask
@@ -73,14 +74,17 @@ class Hub(flask.views.MethodView):
         hub = cursor.fetchone()
         if hub:
             hub = dict(live=hub['sleep_period'] == LIVE_SLEEP_PERIOD,
-                       time=time_since(hub['time']))
+                       since=time_since(hub['time']))
 
-        cursor.execute('select cell_id, short_id, max(time) as time'
+        # select most recent row for each cell of this hub, and join on short id:
+        cursor.execute('select distinct on (cell_id) cell_id, short_id, sleep_period, time'
                        ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
-                       ' group by cell_id, short_id order by time desc', (hub_id,))
-        cells = cursor.fetchall()
-        for cell in cells:
-            cell['time'] = time_since(cell['time'])
+                       ' order by cell_id, time desc', (hub_id,))
+        cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
+        cells = [dict(id=c['short_id'] or c['cell_id'],
+                      live=c['sleep_period'] == LIVE_SLEEP_PERIOD,
+                      since=time_since(c['time']))
+                 for c in cells]
 
         return flask.render_template('setup/hub.html', hub=hub, cells=cells)
 

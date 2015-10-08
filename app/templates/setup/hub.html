@@ -3,18 +3,17 @@
 {% block title %}Hub {{ request.view_args.id|upper }}{% endblock %}
 
 {% block body %}
-<h1>Hub <code>{{ request.view_args.id|upper }}</code></h1>
+<p>Hub <code>{{ request.view_args.id|upper }}</code>
+  {% if hub %}
+  last seen {{ hub.since }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.
+  {% else %}
+  not yet seen.
+  {% endif %}
+</p>
 
-{% if hub %}
-<p>Last seen {{ hub.time }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.</p>
-{% else %}
-<p>Nothing yet&hellip;</p>
-{% endif %}
-
-<h2>Cells</h2>
 <ul>
   {% for c in cells %}
-  <li><code>{% if c.short_id %}{{ c.short_id|upper }}{% else %}{{ c.cell_id }}{% endif %}</code> last seen {{ c.time }}.</li>
+  <li>Cell <code>{{ c.id }}</code> last seen {{ c.since }}, during {% if hub.live %}live{% else %}setup{% endif %} mode.</p></li>
   {% endfor %}
 </ul>
 
