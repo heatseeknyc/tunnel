@@ -111,6 +111,11 @@ class Hub(flask.views.MethodView):
         return 'ok'
 
 
+# convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
+@app.route('/hubs', methods=['POST'])
+def old_hubs_post():
+    return Hub.put(flask.request.form['hub'])
+
 @route('/hubs/', 'relay-hubs')
 class Hubs(flask.views.MethodView):
     @staticmethod
@@ -120,11 +125,6 @@ class Hubs(flask.views.MethodView):
                        ' group by hub_id order by time desc')
         return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
 
-
-# convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
-@app.route('/hubs', methods=['POST'])
-def old_hubs_post():
-    return Hub.put(flask.request.form['hub'])
 
 @route('/hubs/<id>', 'relay-hub')
 class Hub(flask.views.MethodView):
