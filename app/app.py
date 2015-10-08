@@ -111,11 +111,6 @@ class Hub(flask.views.MethodView):
         return 'ok'
 
 
-# old hub firmware doesn't use a trailing slash:
-@app.route('/hubs', methods=['POST'])
-def old_hubs_post():
-    return Hubs.post()
-
 @route('/hubs/', 'relay-hubs')
 class Hubs(flask.views.MethodView):
     @staticmethod
@@ -125,14 +120,11 @@ class Hubs(flask.views.MethodView):
                        ' group by hub_id order by time desc')
         return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
 
-    @staticmethod
-    def post():
-        d = flask.request.form.copy()
-        if not d.get('port'): d['port'] = None  # missing or empty => null
-        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
-                            ' values (%(hub)s, %(pi)s, %(sp)s, %(port)s)', d)
-        return 'ok'
 
+# convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
+@app.route('/hubs', methods=['POST'])
+def old_hubs_post():
+    return Hub.put(flask.request.form['hub'])
 
 @route('/hubs/<id>', 'relay-hub')
 class Hub(flask.views.MethodView):
@@ -149,6 +141,15 @@ class Hub(flask.views.MethodView):
                        ' where hub_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
         return flask.render_template('relay/hub.html', logs=logs, cells=cells, temperatures=temperatures)
+
+    @staticmethod
+    def put(id):
+        hub = flask.request.form.copy()
+        hub['id'] = id
+        if not hub.get('port'): hub['port'] = None  # missing or empty => null
+        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
+                            ' values (%(id)s, %(pi)s, %(sp)s, %(port)s)', hub)
+        return 'ok'
 
 
 @route('/cells/<id>', 'relay-cell')
