@@ -37,6 +37,12 @@ def route(path, name):
     return f
 
 
+def get_xbee_id(short_id, cursor):
+    cursor.execute('select id from xbees where short_id=%s', (short_id,))
+    row = cursor.fetchone()
+    if row: return row['id']
+
+
 def time_since(then):
     since = datetime.now() - then
     if since.days: return '{} days ago'.format(since.days)
@@ -44,6 +50,7 @@ def time_since(then):
     if since.seconds >= 60: return '{} minutes ago'.format(round(since.seconds / 60))
     if since.seconds >= 2: return '{} seconds ago'.format(since.seconds)
     return 'just now'
+
 
 @route('/', 'setup-index')
 class Index(flask.views.MethodView):
@@ -64,10 +71,8 @@ class Hub(flask.views.MethodView):
             if row: return flask.redirect(flask.url_for('setup-hub', id=row['short_id']))
             hub_id = id
         else:
-            cursor.execute('select id from xbees where short_id=%s', (id,))
-            row = cursor.fetchone()
-            if not row: return 'no such id', 404
-            hub_id = row['id']
+            hub_id = get_xbee_id(id, cursor)
+            if not hub_id: return 'no such id', 404
 
         cursor.execute('select sleep_period, time from hubs where hub_id=%s'
                        ' order by time desc limit 1', (hub_id,))
@@ -92,13 +97,11 @@ class Hub(flask.views.MethodView):
     @staticmethod
     def patch(id):
         cursor = db.cursor()
-        cursor.execute('select id from xbees where short_id=%s', (id,))
-        row = cursor.fetchone()
-        if not row: return 'no such id', 404
-        hub_id = row['id']
+
+        hub_id = get_xbee_id(id, cursor)
+        if not hub_id: return 'no such id', 404
 
         # TODO actually look at the data, which should be something like hourly=true...
-        cursor = db.cursor()
         cursor.execute('select port from hubs where hub_id=%s and port is not null'
                        ' order by time desc limit 1', (hub_id,))
         row = cursor.fetchone()
