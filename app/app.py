@@ -115,7 +115,7 @@ class Hub(flask.views.MethodView):
 
 
 # convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
-@app.route('/hubs', methods=['POST'])
+@app.route('/hubs', methods=('POST',))
 def old_hubs_post():
     return Hub.put(flask.request.form['hub'])
 
@@ -170,7 +170,7 @@ class Cell(flask.views.MethodView):
 
 
 # old hub firmware doesn't use a trailing slash:
-@app.route('/temperatures', methods=['POST'])
+@app.route('/temperatures', methods=('POST',))
 def old_temperatures_post():
     return Temperatures.post()
 
