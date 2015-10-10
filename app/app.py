@@ -52,84 +52,76 @@ def time_since(then):
     return 'just now'
 
 
-@route('/', 'setup-index')
-class Index(flask.views.MethodView):
-    @staticmethod
-    def get():
-        return flask.render_template('setup/index.html')
+@app.route('/')
+def setup_index():
+    return flask.render_template('setup/index.html')
 
+@app.route('/<id>')
+def setup_hub(id):
+    cursor = db.cursor()
 
-@route('/<id>', 'setup-hub')
-class Hub(flask.views.MethodView):
-    @staticmethod
-    def get(id):
-        cursor = db.cursor()
-
-        if len(id) == 16:
-            cursor.execute('select short_id from xbees where id=%s', (id,))
-            row = cursor.fetchone()
-            if row: return flask.redirect(flask.url_for('setup-hub', id=row['short_id']))
-            hub_id = id
-        else:
-            hub_id = get_xbee_id(id, cursor)
-            if not hub_id: return 'no such id', 404
-
-        cursor.execute('select sleep_period, time from hubs where hub_id=%s'
-                       ' order by time desc limit 1', (hub_id,))
-        hub = cursor.fetchone()
-        # select most recent row for each cell of this hub, and join on short id:
-        cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
-                       ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
-                       ' order by cell_id, time desc', (hub_id,))
-        cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
-
-        if hub:
-            # seeing a cell counts as seeing the hub:
-            time = max(hub['time'], cells[0]['time']) if cells else hub['time']
-            hub = dict(live=hub['sleep_period'] == LIVE_SLEEP_PERIOD,
-                       since=time_since(time))
-        cells = [dict(id=c['short_id'] or c['cell_id'],
-                      since=time_since(c['time']))
-                 for c in cells]
-
-        return flask.render_template('setup/hub.html', hub=hub, cells=cells)
-
-    @staticmethod
-    def patch(id):
-        cursor = db.cursor()
-
+    if len(id) == 16:
+        cursor.execute('select short_id from xbees where id=%s', (id,))
+        row = cursor.fetchone()
+        if row: return flask.redirect(flask.url_for('setup-hub', id=row['short_id']))
+        hub_id = id
+    else:
         hub_id = get_xbee_id(id, cursor)
         if not hub_id: return 'no such id', 404
 
-        # TODO actually look at the data, which should be something like hourly=true...
-        cursor.execute('select port from hubs where hub_id=%s and port is not null'
-                       ' order by time desc limit 1', (hub_id,))
-        row = cursor.fetchone()
-        if not row: return 'no ssh port for hub', 404
+    cursor.execute('select sleep_period, time from hubs where hub_id=%s'
+                   ' order by time desc limit 1', (hub_id,))
+    hub = cursor.fetchone()
+    # select most recent row for each cell of this hub, and join on short id:
+    cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
+                   ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
+                   ' order by cell_id, time desc', (hub_id,))
+    cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
 
-        logging.info(subprocess.check_output([
-            'ssh', '-p', str(row['port']), 'localhost',
-            'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(LIVE_SLEEP_PERIOD)
-        ]))
-        return 'ok'
+    if hub:
+        # seeing a cell counts as seeing the hub:
+        time = max(hub['time'], cells[0]['time']) if cells else hub['time']
+        hub = dict(live=hub['sleep_period'] == LIVE_SLEEP_PERIOD,
+                   since=time_since(time))
+    cells = [dict(id=c['short_id'] or c['cell_id'],
+                  since=time_since(c['time']))
+             for c in cells]
+
+    return flask.render_template('setup/hub.html', hub=hub, cells=cells)
+
+@app.route('/<id>', methods=('PATCH',))
+def setup_patch_hub(id):
+    cursor = db.cursor()
+
+    hub_id = get_xbee_id(id, cursor)
+    if not hub_id: return 'no such id', 404
+
+    # TODO actually look at the data, which should be something like hourly=true...
+    cursor.execute('select port from hubs where hub_id=%s and port is not null'
+                   ' order by time desc limit 1', (hub_id,))
+    row = cursor.fetchone()
+    if not row: return 'no ssh port for hub', 404
+
+    logging.info(subprocess.check_output([
+        'ssh', '-p', str(row['port']), 'localhost',
+        'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(LIVE_SLEEP_PERIOD)
+    ]))
+    return 'ok'
 
 
 # convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
 @app.route('/hubs', methods=('POST',))
-def old_hubs_post():
+def relay_old_hubs_post():
     return Hub.put(flask.request.form['hub'])
 
-@route('/hubs/', 'relay-hubs')
-class Hubs(flask.views.MethodView):
-    @staticmethod
-    def get():
-        cursor = db.cursor()
-        cursor.execute('select hub_id, max(time) as time from hubs'
-                       ' group by hub_id order by time desc')
-        return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
+@app.route('/hubs/')
+def relay_hubs():
+    cursor = db.cursor()
+    cursor.execute('select hub_id, max(time) as time from hubs'
+                   ' group by hub_id order by time desc')
+    return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
 
-
-@route('/hubs/<id>', 'relay-hub')
+@route('/hubs/<id>', 'relay_hub')
 class Hub(flask.views.MethodView):
     @staticmethod
     def get(id):
@@ -154,27 +146,23 @@ class Hub(flask.views.MethodView):
                             ' values (%(id)s, %(pi)s, %(sp)s, %(port)s)', hub)
         return 'ok'
 
-
-@route('/cells/<id>', 'relay-cell')
-class Cell(flask.views.MethodView):
-    @staticmethod
-    def get(id):
-        cursor = db.cursor()
-        cursor.execute('select hub_id, max(time) as time from temperatures'
-                       ' where cell_id=%s group by hub_id order by time desc', (id,))
-        hubs = cursor.fetchall()
-        cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
-                       ' where cell_id=%s order by hub_time desc limit 100', (id,))
-        temperatures = cursor.fetchall()
-        return flask.render_template('relay/cell.html', hubs=hubs, temperatures=temperatures)
-
+@app.route('/cells/<id>')
+def relay_cell(id):
+    cursor = db.cursor()
+    cursor.execute('select hub_id, max(time) as time from temperatures'
+                   ' where cell_id=%s group by hub_id order by time desc', (id,))
+    hubs = cursor.fetchall()
+    cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
+                   ' from temperatures where cell_id=%s order by hub_time desc limit 100', (id,))
+    temperatures = cursor.fetchall()
+    return flask.render_template('relay/cell.html', hubs=hubs, temperatures=temperatures)
 
 # old hub firmware doesn't use a trailing slash:
 @app.route('/temperatures', methods=('POST',))
-def old_temperatures_post():
+def relay_old_temperatures_post():
     return Temperatures.post()
 
-@route('/temperatures/', 'relay-temperatures')
+@route('/temperatures/', 'relay_temperatures')
 class Temperatures(flask.views.MethodView):
     @staticmethod
     def get():
