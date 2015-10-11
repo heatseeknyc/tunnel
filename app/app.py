@@ -63,7 +63,7 @@ def setup_hub(id):
     if len(id) == 16:
         cursor.execute('select short_id from xbees where id=%s', (id,))
         row = cursor.fetchone()
-        if row: return flask.redirect(flask.url_for('setup-hub', id=row['short_id']))
+        if row: return flask.redirect(flask.url_for('setup_hub', id=row['short_id']))
         hub_id = id
     else:
         hub_id = get_xbee_id(id, cursor)
