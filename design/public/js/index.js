@@ -5,17 +5,24 @@ $(function() {
   var submitBtn = $("#getStarted");
   var inputField = $('#xbeeId');
 
+  enableButton();
+
   inputField.keypress(function(event) {
     limitLength(this, event);
     limitCharacters(event);
-    enableButton(this);
+    enableButton();
   }).keyup(function(event) {
     limitLength(this, event);
     limitCopyPasteCharacters(this);
-    enableButton(this);
+    enableButton();
   });
 
-  function enableButton(element) {
+  $('#form').submit(function(event) {
+    event.preventDefault();
+    location = '/' + $('#xbeeId').val().toLowerCase().replace('o', '0');
+  });
+
+  function enableButton() {
     var disabled = inputField.val().length === maxChars ? false : true;
     submitBtn.prop('disabled', disabled);
   }
@@ -41,10 +48,5 @@ $(function() {
       $(element).val($(element).val().substr(0, maxChars));
     }
   }
-
-  $('#form').submit(function(event) {
-    event.preventDefault();
-    location = '/' + $('#xbeeId').val().toLowerCase().replace('o', '0');
-  });
 
 });
