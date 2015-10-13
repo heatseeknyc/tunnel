@@ -1,0 +1,5 @@
+{% if hub %}
+Last seen {{ hub.since }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.
+{% else %}
+Not yet seen.
+{% endif %}

@@ -4,20 +4,10 @@
 
 {% block body %}
 <h1>Hub <code>{{ request.view_args.id|upper }}</code></h1>
-<p>
-  {% if hub %}
-  Last seen {{ hub.since }}, in {% if hub.live %}live{% else %}setup{% endif %} mode.
-  {% else %}
-  Not yet seen.
-  {% endif %}
-</p>
+<p>{% include 'setup/_hub.html' %}</p>
 
 <h2>Cells</h2>
-<ul>
-  {% for c in cells %}
-  <li><code>{{ c.id|upper }}</code> last seen {{ c.since }}.</p></li>
-  {% endfor %}
-</ul>
+<ul>{% include 'setup/_cells.html' %}</ul>
 
 <p><button id="hourly">Switch to Hourly Readings</button></p>
 {% endblock %}
