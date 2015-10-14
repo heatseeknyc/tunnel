@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 import operator
+import os
 import subprocess
 
 import flask
@@ -16,7 +17,9 @@ logging.basicConfig(level=logging.INFO)
 
 
 app = flask.Flask(__name__)
-db = psycopg2.connect(host='localhost', user='webdb', password='password',
+db = psycopg2.connect(host=os.environ['DB_PORT_5432_TCP_ADDR'],
+                      port=os.environ['DB_PORT_5432_TCP_PORT'],
+                      user='postgres',
                       cursor_factory=psycopg2.extras.DictCursor)
 
 

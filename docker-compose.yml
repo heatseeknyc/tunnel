@@ -1,0 +1,16 @@
+db:
+  build: db
+  volumes_from:
+    - db-data
+
+app:
+  build: app
+  links:
+    - db
+
+web:
+  build: web
+  links:
+    - app
+  ports:
+    - 80:80
