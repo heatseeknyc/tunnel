@@ -10,13 +10,13 @@ RUN apt-get update \
     && apt-get autoremove --yes --purge curl \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /opt/app
+WORKDIR /opt
 COPY requirements.txt ./
 RUN pip3 install -r requirements.txt
-COPY ./ ./
+COPY ./ app/
 
 EXPOSE 3030
 CMD ["uwsgi", \
     "--plugin", "python3", \
     "--socket", "0.0.0.0:3030", \
-    "--module", "app:app"]
+    "--module", "app.app:app"]

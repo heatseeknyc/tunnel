@@ -6,21 +6,16 @@ import subprocess
 
 import flask
 import flask.views
-import psycopg2
-import psycopg2.extras
 
-
-LIVE_SLEEP_PERIOD = (59*60 + 50) * 100  # 59m50s in centiseconds
+from . import common
 
 
 logging.basicConfig(level=logging.INFO)
 
+LIVE_SLEEP_PERIOD = (59*60 + 50) * 100  # 59m50s in centiseconds
 
 app = flask.Flask(__name__)
-db = psycopg2.connect(host=os.environ['DB_PORT_5432_TCP_ADDR'],
-                      port=os.environ['DB_PORT_5432_TCP_PORT'],
-                      user='postgres',
-                      cursor_factory=psycopg2.extras.DictCursor)
+db = common.get_db()
 
 
 @app.teardown_request
@@ -31,7 +26,6 @@ def teardown_request(exception):
     else:
         db.commit()
 
-
 def route(path, name):
     """decorator to add a route to a View class"""
     def f(cls):
@@ -39,14 +33,12 @@ def route(path, name):
         return cls
     return f
 
-
 def get_xbee_id(id, cursor):
     if len(id) == 16: return id  # already an xbee id
     cursor.execute('select id from xbees where short_id=%s', (id,))
     row = cursor.fetchone()
     if not row: flask.abort(404)
     return row['id']
-
 
 def time_since(then):
     since = datetime.now() - then

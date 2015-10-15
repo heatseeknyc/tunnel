@@ -3,9 +3,9 @@
 import logging
 import time
 
-import psycopg2
-import psycopg2.extras
 import requests
+
+from . import common
 
 
 logging.basicConfig(level=logging.INFO)
@@ -30,8 +30,7 @@ def transmit_temperature(temperature):
 
 def transmit():
     """Continually transmit temperatures from database to heatseeknyc.com."""
-    database = psycopg2.connect(host='localhost', user='webdb', password='password',
-                                cursor_factory=psycopg2.extras.DictCursor)
+    database = common.get_db()
     while True:
         with database:
             cursor = database.cursor()

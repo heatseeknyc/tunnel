@@ -14,3 +14,9 @@ web:
     - app
   ports:
     - 80:80
+
+batch:
+  build: app
+  links:
+    - db
+  command: python3 -m app.batch
