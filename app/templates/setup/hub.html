@@ -4,10 +4,10 @@
 
 {% block body %}
 <h1>Hub <code>{{ request.view_args.id|upper }}</code></h1>
-<p>{% include 'setup/_hub.html' %}</p>
+<p>{{ hub_partial }}</p>
 
 <h2>Cells</h2>
-<ul>{% include 'setup/_cells.html' %}</ul>
+<ul>{{ cells_partial }}</ul>
 
 <p><button id="hourly">Switch to Hourly Readings</button></p>
 {% endblock %}

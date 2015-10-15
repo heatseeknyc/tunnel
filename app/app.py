@@ -62,8 +62,8 @@ def setup_hub(id):
         if row: return flask.redirect(flask.url_for('setup_hub', id=row['short_id']))
 
     return flask.render_template('setup/hub.html',
-                                 hub=setup_hub_partial(id),
-                                 cells=setup_hub_cells_partial(id))
+                                 hub_partial=setup_hub_partial(id),
+                                 cells_partial=setup_hub_cells_partial(id))
 
 @app.route('/<id>/_hub')
 def setup_hub_partial(id):
@@ -82,7 +82,7 @@ def setup_hub_partial(id):
 
     if hub:
         hub = dict(live=hub['sleep_period'] == LIVE_SLEEP_PERIOD,
-                   since=time_since(time))
+                   since=time_since(hub['time']))
     return flask.render_template('setup/_hub.html', hub=hub)
 
 @app.route('/<id>/_cells')
