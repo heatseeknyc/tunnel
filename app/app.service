@@ -1,0 +1,12 @@
+[Unit]
+After=db.service
+Requires=db.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker rm -f app
+ExecStart=/usr/bin/docker run --name app --link db app
+ExecStop=/usr/bin/docker stop app
+
+[Install]
+WantedBy=multi-user.target
