@@ -1,20 +1,18 @@
 from datetime import datetime
 import logging
 import operator
-import os
 import subprocess
 
 import flask
 import flask.views
 
-from . import common
+from . import app, common
 
 
 logging.basicConfig(level=logging.INFO)
 
 LIVE_SLEEP_PERIOD = (59*60 + 50) * 100  # 59m50s in centiseconds
 
-app = flask.Flask(__name__)
 db = common.get_db()
 
 
@@ -188,7 +186,3 @@ class Temperatures(flask.views.MethodView):
         db.cursor().execute('insert into temperatures (hub_id, cell_id, temperature, sleep_period, relay, hub_time)'
                             ' values (%(hub)s, %(cell)s, %(temp)s, %(sp)s, %(relay)s, %(time)s)', d)
         return 'ok'
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
