@@ -10,4 +10,4 @@ docker build -t app:dev dev/app
 
 docker run --name db --volumes-from db-data -d db
 echo -e "\n###\n### Starting server at http://$(docker-machine ip $machine):$port\n###\n"
-docker run --name app --link db -v "$PWD/app":/opt/app -p $port:$port app:dev
+docker run --name app --link db -v "$PWD/app":/opt/app:ro -p $port:$port app:dev
