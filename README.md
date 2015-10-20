@@ -11,6 +11,12 @@
     …
     bash dev/stop.sh
 
+## Connecting to the Database
+Examples:
+- `bash dev/db.sh`
+- `bash dev/db.sh < commands.sql`
+- `bash dev/db.sh pg_dump > dump.sql`
+
 
 # Production, on CoreOS
 
@@ -29,3 +35,9 @@ e.g. for `app`:
 
     docker build -t app app
     sudo systemctl restart app.service
+
+## Connecting to the Database
+Examples:
+- `bash db/connect.sh`
+- `bash db/connect.sh < commands.sql`
+- `bash db/connect.sh pg_dump > dump.sql`
