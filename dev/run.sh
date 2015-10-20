@@ -1,8 +1,13 @@
 port=5000
 
-set -x
+. dev/docker-machine.sh
 
-. dev/stop.sh
+set +e
+docker stop app
+docker stop db
+docker rm app
+docker rm db
+set -e
 
 docker build -t db db
 docker build -t app app
