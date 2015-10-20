@@ -5,9 +5,9 @@ create table temperatures (
     temperature real not null,
     sleep_period integer not null,
     relay boolean not null,
-    hub_time timestamp not null,
-    time timestamp not null default now(),
-    relayed_time timestamp
+    hub_time timestamp with time zone not null,
+    time timestamp with time zone not null default now(),
+    relayed_time timestamp with time zone
 );
 create index on temperatures (hub_id, time desc);
 create index on temperatures (cell_id, time desc);
@@ -18,7 +18,7 @@ create table hubs (
     pi_id text not null check (pi_id != ''),
     sleep_period integer not null,
     port integer,
-    time timestamp not null default now()
+    time timestamp with time zone not null default now()
 );
 create index on hubs (hub_id, time desc);
 
