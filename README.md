@@ -23,7 +23,7 @@ Examples:
 ## Initial Setup
 ```bash
 bash db/init.sh
-for x in db app web; do
+for x in db app web batch; do
   docker build -t $x $x
   sudo systemctl enable $PWD/$x/$x.service
   sudo systemctl start $x.service
