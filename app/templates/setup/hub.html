@@ -3,13 +3,30 @@
 {% block title %}Hub {{ request.view_args.id|upper }}{% endblock %}
 
 {% block body %}
-<h1>Hub <code>{{ request.view_args.id|upper }}</code></h1>
-<p>{{ hub_partial|safe }}</p>
 
-<h2>Cells</h2>
-<ul>{{ cells_partial|safe }}</ul>
-
-<p><button id="hourly">Switch to Hourly Readings</button></p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="logo-container">
+        <div class="logo" alt="Heat Seek Logo"></div>
+        <h1>Setup</h1>
+      </div>
+    </div>
+  </div>
+  <div class="row blue">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="hub-info">
+        <h3><span>Hub </span><code>{{ request.view_args.id|upper }}</code></h3>
+        <p>{{ hub_partial|safe }}</p>
+      </div>
+      <div class="cell-info">
+        <h4>Cells</h4>
+        <ul>{{ cells_partial|safe }}</ul>
+      </div>
+      <button class="btn btn-default btn-lg btn-block" id="hourly">Switch to Hourly Readings</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block js %}<script src="/static/setup/hub.js"></script>{% endblock %}

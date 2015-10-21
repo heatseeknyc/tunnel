@@ -1,11 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Heat Seek Setup{% endblock %}
 {% block body %}
-<form id="form">
-  <label for="xbee_id">Hub's 4-Character ID:</label>
-  <input type="text" id="xbee_id">
-  <button type="submit">Get Started</button>
-</form>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="logo-container">
+        <div class="logo" alt="Heat Seek Logo"></div>
+        <h1>Setup</h1>
+      </div>
+    </div>
+  </div>
+  <div class="row blue">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="instructions">
+        <form id="form">
+          <div class="center-container">
+            <img src="/static/hub.png" class="img-responsive" alt="Photo of a Heat Seek Hub">
+          </div>
+          <div class="form-group">
+            <label name="xbee_id">Please enter the hub's 4-digit code:</label>
+            <div class="center-container">
+              <input type="text"  maxlength="4" class="form-control" id="xbeeId" placeholder="C0DE" autofocus="autofocus">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-default btn-lg btn-block" disabled="disabled" id="getStarted">
+            Get Started
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block js %}
 <script src="/static/setup/index.js"></script>
