@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 import operator
 import subprocess
@@ -39,7 +39,7 @@ def get_xbee_id(id, cursor):
     return row['id']
 
 def time_since(then):
-    since = datetime.now() - then
+    since = datetime.now(tz=timezone.utc) - then
     if since.days: return '{} days ago'.format(since.days)
     if since.seconds >= 60 * 60: return '{} hours ago'.format(round(since.seconds / 60 / 60))
     if since.seconds >= 60: return '{} minutes ago'.format(round(since.seconds / 60))
