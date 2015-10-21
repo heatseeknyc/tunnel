@@ -43,3 +43,7 @@ Examples:
 - `bash db/connect.sh`
 - `bash db/connect.sh < commands.sql`
 - `bash db/connect.sh pg_dump > dump.sql`
+
+## Status and Logs
+
+    systemctl status db app web batch
