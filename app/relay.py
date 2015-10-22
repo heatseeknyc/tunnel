@@ -1,4 +1,6 @@
 from datetime import datetime
+import logging
+import subprocess
 
 import flask
 import flask.views
@@ -49,6 +51,22 @@ class Hub(flask.views.MethodView):
         db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
                             ' values (%(id)s, %(pi)s, %(sp)s, %(port)s)', hub)
         return 'ok'
+
+    @staticmethod
+    def patch(id):
+        cursor = db.cursor()
+        # TODO actually look at the data, which should be something like hourly=true...
+        cursor.execute('select port from hubs where hub_id=%s and port is not null'
+                       ' order by time desc limit 1', (id,))
+        row = cursor.fetchone()
+        if not row: return 'no ssh port for hub', 404
+
+        logging.info(subprocess.check_output([
+            'ssh', '-p', str(row['port']), 'localhost',
+            'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(common.LIVE_SLEEP_PERIOD)
+        ]))
+        return 'ok'
+
 
 @app.route('/cells/<id>')
 def relay_cell(id):

@@ -1,7 +1,7 @@
 $(function() {
 
   $('#hourly').click(function() {
-    $.ajax({method: 'PATCH', data: {hourly: true}});
+    $.ajax(RELAY_HUB_URL, {method: 'PATCH', data: {hourly: true}});
   });
 
 });

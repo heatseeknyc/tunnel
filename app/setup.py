@@ -1,7 +1,5 @@
 from datetime import datetime, timezone
-import logging
 import operator
-import subprocess
 
 import flask
 
@@ -37,13 +35,15 @@ def setup_index():
 
 @app.route('/<id>')
 def setup_hub(id):
+    cursor = db.cursor()
+
     if len(id) == 16:
-        cursor = db.cursor()
         cursor.execute('select short_id from xbees where id=%s', (id,))
         row = cursor.fetchone()
         if row: return flask.redirect(flask.url_for('setup_hub', id=row['short_id']))
 
     return flask.render_template('setup/hub.html',
+                                 hub_id=get_xbee_id(id, cursor),
                                  hub_partial=setup_hub_partial(id),
                                  cells_partial=setup_hub_cells_partial(id))
 
@@ -79,22 +79,3 @@ def setup_hub_cells_partial(id):
              for c in sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)]
 
     return flask.render_template('setup/_cells.html', cells=cells)
-
-@app.route('/<id>', methods=('PATCH',))
-def setup_patch_hub(id):
-    cursor = db.cursor()
-
-    hub_id = get_xbee_id(id, cursor)
-    if not hub_id: return 'no such id', 404
-
-    # TODO actually look at the data, which should be something like hourly=true...
-    cursor.execute('select port from hubs where hub_id=%s and port is not null'
-                   ' order by time desc limit 1', (hub_id,))
-    row = cursor.fetchone()
-    if not row: return 'no ssh port for hub', 404
-
-    logging.info(subprocess.check_output([
-        'ssh', '-p', str(row['port']), 'localhost',
-        'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(common.LIVE_SLEEP_PERIOD)
-    ]))
-    return 'ok'

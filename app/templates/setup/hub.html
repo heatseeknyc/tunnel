@@ -29,4 +29,7 @@
 </div>
 {% endblock %}
 
-{% block js %}<script src="/static/setup/hub.js"></script>{% endblock %}
+{% block js %}
+<script>var RELAY_HUB_URL="{{ url_for('relay_hub', id=hub_id) }}";</script>
+<script src="/static/setup/hub.js"></script>
+{% endblock %}
