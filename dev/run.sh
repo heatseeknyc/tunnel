@@ -17,7 +17,6 @@ docker build -t app app
 docker build -t app:dev dev/app
 
 while ! bash db/connect.sh psql -c select; do
-    echo 'waiting for db...'
     sleep 1
 done
 
