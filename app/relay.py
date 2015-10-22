@@ -17,17 +17,17 @@ def route(path, name):
 
 # convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
 @app.route('/hubs', methods=('POST',))
-def relay_old_hubs_post():
+def old_hubs_post():
     return Hub.put(flask.request.form['hub'])
 
 @app.route('/hubs/')
-def relay_hubs():
+def hubs():
     cursor = db.cursor()
     cursor.execute('select hub_id, max(time) as time from hubs'
                    ' group by hub_id order by time desc')
     return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
 
-@route('/hubs/<id>', 'relay_hub')
+@route('/hubs/<id>', 'hub')
 class Hub(flask.views.MethodView):
     @staticmethod
     def get(id):
@@ -69,7 +69,7 @@ class Hub(flask.views.MethodView):
 
 
 @app.route('/cells/<id>')
-def relay_cell(id):
+def cell(id):
     cursor = db.cursor()
     cursor.execute('select hub_id, max(time) as time from temperatures'
                    ' where cell_id=%s group by hub_id order by time desc', (id,))
@@ -81,10 +81,10 @@ def relay_cell(id):
 
 # old hub firmware doesn't use a trailing slash:
 @app.route('/temperatures', methods=('POST',))
-def relay_old_temperatures_post():
+def old_temperatures_post():
     return Temperatures.post()
 
-@route('/temperatures/', 'relay_temperatures')
+@route('/temperatures/', 'temperatures')
 class Temperatures(flask.views.MethodView):
     @staticmethod
     def get():

@@ -13,7 +13,7 @@
 <h2>Cells</h2>
 <ul>
   {% for c in cells %}
-  <li>{{ c.time }} <a href="{{ url_for('relay_cell', id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a></li>
+  <li>{{ c.time }} <a href="{{ url_for('cell', id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a></li>
   {% endfor %}
 </ul>
 

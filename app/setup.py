@@ -30,7 +30,7 @@ def time_since(then):
 
 
 @app.route('/')
-def setup_index():
+def index():
     return flask.render_template('setup/index.html')
 
 @app.route('/<id>')
