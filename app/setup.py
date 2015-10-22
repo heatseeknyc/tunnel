@@ -1,0 +1,100 @@
+from datetime import datetime, timezone
+import logging
+import operator
+import subprocess
+
+import flask
+
+from . import app, common, db
+
+
+def route(path, name):
+    """decorator to add a route to a View class"""
+    def f(cls):
+        app.add_url_rule(path, view_func=cls.as_view(name))
+        return cls
+    return f
+
+def get_xbee_id(id, cursor):
+    if len(id) == 16: return id  # already an xbee id
+    cursor.execute('select id from xbees where short_id=%s', (id,))
+    row = cursor.fetchone()
+    if not row: flask.abort(404)
+    return row['id']
+
+def time_since(then):
+    since = datetime.now(timezone.utc) - then
+    if since.days: return '{} days ago'.format(since.days)
+    if since.seconds >= 60 * 60: return '{} hours ago'.format(round(since.seconds / 60 / 60))
+    if since.seconds >= 60: return '{} minutes ago'.format(round(since.seconds / 60))
+    if since.seconds >= 2: return '{} seconds ago'.format(since.seconds)
+    return 'just now'
+
+
+@app.route('/')
+def setup_index():
+    return flask.render_template('setup/index.html')
+
+@app.route('/<id>')
+def setup_hub(id):
+    if len(id) == 16:
+        cursor = db.cursor()
+        cursor.execute('select short_id from xbees where id=%s', (id,))
+        row = cursor.fetchone()
+        if row: return flask.redirect(flask.url_for('setup_hub', id=row['short_id']))
+
+    return flask.render_template('setup/hub.html',
+                                 hub_partial=setup_hub_partial(id),
+                                 cells_partial=setup_hub_cells_partial(id))
+
+@app.route('/<id>/_hub')
+def setup_hub_partial(id):
+    cursor = db.cursor()
+    hub_id = get_xbee_id(id, cursor)
+    cursor.execute('select sleep_period, time from hubs where hub_id=%s'
+                   ' order by time desc limit 1', (hub_id,))
+    hub = cursor.fetchone()
+    cursor.execute('select sleep_period, time from temperatures where hub_id=%s'
+                   ' order by time desc limit 1', (hub_id,))
+    temperature = cursor.fetchone()
+
+    # use the most recent of the sightings:
+    if hub and temperature: hub = max(hub, temperature, key=operator.itemgetter('time'))
+    else: hub = hub or temperature
+
+    if hub:
+        hub = dict(live=hub['sleep_period'] == common.LIVE_SLEEP_PERIOD,
+                   since=time_since(hub['time']))
+    return flask.render_template('setup/_hub.html', hub=hub)
+
+@app.route('/<id>/_cells')
+def setup_hub_cells_partial(id):
+    cursor = db.cursor()
+    # select most recent row for each cell of this hub, and join on short id:
+    cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
+                   ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
+                   ' order by cell_id, time desc', (get_xbee_id(id, cursor),))
+    cells = [dict(id=c['short_id'] or c['cell_id'],
+                  since=time_since(c['time']))
+             for c in sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)]
+
+    return flask.render_template('setup/_cells.html', cells=cells)
+
+@app.route('/<id>', methods=('PATCH',))
+def setup_patch_hub(id):
+    cursor = db.cursor()
+
+    hub_id = get_xbee_id(id, cursor)
+    if not hub_id: return 'no such id', 404
+
+    # TODO actually look at the data, which should be something like hourly=true...
+    cursor.execute('select port from hubs where hub_id=%s and port is not null'
+                   ' order by time desc limit 1', (hub_id,))
+    row = cursor.fetchone()
+    if not row: return 'no ssh port for hub', 404
+
+    logging.info(subprocess.check_output([
+        'ssh', '-p', str(row['port']), 'localhost',
+        'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(common.LIVE_SLEEP_PERIOD)
+    ]))
+    return 'ok'
