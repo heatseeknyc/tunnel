@@ -3,7 +3,7 @@
 {% block body %}
 <ul>
   {% for h in hubs %}
-  <li>{{ h.time }} <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a></li>
+  <li>{{ h.time }} <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a> <i>{{ h.sleep_period }}</i> <b>{{ h.port }}</b></li>
   {% endfor %}
 </ul>
 {% endblock %}

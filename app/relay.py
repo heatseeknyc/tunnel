@@ -23,8 +23,10 @@ def old_hubs_post():
 @app.route('/hubs/')
 def hubs():
     cursor = db.cursor()
-    cursor.execute('select hub_id, max(time) as time from hubs'
-                   ' group by hub_id order by time desc')
+    # select most recent row for each hub, and join on short id:
+    cursor.execute('select distinct on (hub_id) hub_id, short_id, sleep_period, port, time'
+                   ' from hubs left join xbees on xbees.id=hub_id'
+                   ' order by hub_id, time desc')
     return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
 
 @route('/hubs/<id>', 'hub')
