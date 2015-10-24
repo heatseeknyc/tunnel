@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+import operator
 import subprocess
 
 import flask
@@ -27,7 +28,8 @@ def hubs():
     cursor.execute('select distinct on (hub_id) hub_id, short_id, sleep_period, port, time'
                    ' from hubs left join xbees on xbees.id=hub_id'
                    ' order by hub_id, time desc')
-    return flask.render_template('relay/hubs.html', hubs=cursor.fetchall())
+    hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
+    return flask.render_template('relay/hubs.html', hubs=hubs)
 
 @route('/hubs/<id>', 'hub')
 class Hub(flask.views.MethodView):
