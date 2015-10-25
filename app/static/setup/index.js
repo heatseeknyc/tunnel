@@ -11,10 +11,12 @@ $(function() {
     limitLength(this, event);
     limitCharacters(event);
     enableButton();
+    enterPressed(event);
   }).keyup(function(event) {
     limitLength(this, event);
     limitCopyPasteCharacters(this);
     enableButton();
+    enterPressed(event);
   });
 
   $('#form').submit(function(event) {
@@ -25,6 +27,13 @@ $(function() {
   function enableButton() {
     var disabled = inputField.val().length === maxChars ? false : true;
     submitBtn.prop('disabled', disabled);
+  }
+
+  function enterPressed(event) {
+    if (event.keyCode == 13 && submitBtn.is(':enabled')) {
+      $('form#form').submit();
+      return false;
+    }
   }
 
   function limitCharacters(e) {
