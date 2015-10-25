@@ -9,4 +9,9 @@ RUN mkdir /var/run/sshd
 COPY public/ /etc/ssh/
 COPY secret/ /etc/ssh/
 
+RUN useradd -Um hubs
+COPY authorized_keys /home/hubs/.ssh/
+RUN chown hubs:hubs /home/hubs/.ssh/authorized_keys
+RUN chmod 600 /home/hubs/.ssh/authorized_keys
+
 CMD ["/usr/sbin/sshd", "-D"]
