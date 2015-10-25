@@ -20,6 +20,8 @@ Examples:
 
 # Production, on CoreOS
 
+`ssh -p 2222 core@setup.heatseeknyc.com`
+
 ## Initial Setup
 ```bash
 bash db/init.sh
