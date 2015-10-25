@@ -1,4 +1,4 @@
-# we use ubuntu to mimic the server that the hubs are already used to connecting to
+# we use ubuntu to mimic the server that the hubs are used to connecting to
 FROM ubuntu:trusty
 
 RUN apt-get update \
