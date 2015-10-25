@@ -6,6 +6,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /var/run/sshd
+COPY public/ /etc/ssh/
 COPY secret/ /etc/ssh/
 
 CMD ["/usr/sbin/sshd", "-D"]
