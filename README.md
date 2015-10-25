@@ -28,17 +28,17 @@ bash db/init.sh
 for x in db app web tunnel; do
   docker build -t $x $x
   sudo systemctl enable $PWD/$x/$x.service
-  sudo systemctl start $x.service
+  sudo systemctl start $x
 done
 sudo systemctl enable $PWD/app/batch.service
-sudo systemctl start batch.service
+sudo systemctl start batch
 ```
 
 ## Rebuilding
 e.g. for `app`:
 
     docker build -t app app
-    sudo systemctl restart app.service
+    sudo systemctl restart app
 
 ## Connecting to the Database
 Examples:
