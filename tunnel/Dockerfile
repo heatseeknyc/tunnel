@@ -15,6 +15,7 @@ RUN apt-get update && \
 RUN mkdir /var/run/sshd
 COPY public/ /etc/ssh/
 COPY secret/ /etc/ssh/
+COPY ssh_config $HOME/.ssh/config
 
 RUN useradd -Um hubs
 COPY authorized_keys /home/hubs/.ssh/
