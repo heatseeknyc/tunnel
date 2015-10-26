@@ -1,4 +1,7 @@
-# we use ubuntu to mimic the server that the hubs are used to connecting to
+# "Heat Seek OS" was built with connections to an old relay server running Ubuntu 14.04,
+# which unfortunately means hubs now expect an outdated key type (ecdsa-sha2-nistp256)
+# so we have to stick to the same openssh version
+# which is most easily accomplished by continuing to use Ubuntu 14.04
 FROM ubuntu:trusty
 
 RUN apt-get update && \
@@ -11,16 +14,22 @@ RUN apt-get update && \
     curl https://bootstrap.pypa.io/get-pip.py | python3 && \
     apt-get autoremove --yes --purge curl && \
     rm -rf /var/lib/apt/lists/*
-
 RUN mkdir /var/run/sshd
-COPY public/ /etc/ssh/
-COPY secret/ /etc/ssh/
-COPY ssh_config /root/.ssh/config
 
+# identify ourselves as the host that hubs expect:
+COPY sshd/ /etc/ssh/
+COPY secret/sshd/ /etc/ssh/
+
+# authorize hubs to log in as user 'hubs':
 RUN useradd -Um hubs
-COPY authorized_keys /home/hubs/.ssh/
+COPY ssh/authorized_keys /home/hubs/.ssh/
 RUN chown hubs:hubs /home/hubs/.ssh/authorized_keys
 RUN chmod 600 /home/hubs/.ssh/authorized_keys
+
+# use a key trusted by hubs when ssh'ing back into them:
+COPY ssh/id_rsa.pub /root/.ssh/
+COPY secret/ssh/id_rsa /root/.ssh/
+RUN chmod 600 /root/.ssh/id_rsa
 
 WORKDIR /opt/tunnel
 COPY requirements.txt ./
