@@ -1,6 +1,8 @@
 [Unit]
 After=db.service
 Requires=db.service
+After=tunnel.service
+Requires=tunnel.service
 
 [Service]
 TimeoutStartSec=0

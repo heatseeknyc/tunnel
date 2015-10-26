@@ -1,10 +1,11 @@
 from datetime import datetime
 import logging
 import operator
-import subprocess
+import os
 
 import flask
 import flask.views
+import requests
 
 from . import app, common, db
 
@@ -65,10 +66,14 @@ class Hub(flask.views.MethodView):
         row = cursor.fetchone()
         if not row: return 'no ssh port for hub', 404
 
-        logging.info(subprocess.check_output([
-            'ssh', '-p', str(row['port']), 'localhost',
-            'sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'.format(common.LIVE_SLEEP_PERIOD)
-        ]))
+        command = ('sudo PYTHONPATH=firmware python3 -m hub.set_sleep_period {}'
+                   .format(common.LIVE_SLEEP_PERIOD))
+        response = requests.post('http://{}:{}/{}'.format(os.environ['TUNNEL_PORT_80_TCP_ADDR'],
+                                                          os.environ['TUNNEL_PORT_80_TCP_PORT'],
+                                                          row['port']),
+                                 dict(command=command))
+        logging.info('tunnel response:\n' + response.text)
+        response.raise_for_status()
         return 'ok'
 
 
