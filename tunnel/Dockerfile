@@ -26,6 +26,7 @@ COPY ssh/authorized_keys /home/hubs/.ssh/
 RUN chown hubs:hubs /home/hubs/.ssh/authorized_keys
 RUN chmod 600 /home/hubs/.ssh/authorized_keys
 
+RUN mkdir /root/.ssh
 COPY ssh/config /root/.ssh/
 # use a key trusted by hubs when ssh'ing back into them:
 COPY ssh/id_rsa.pub /root/.ssh/
