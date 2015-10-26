@@ -49,3 +49,7 @@ Examples:
 ## Status and Logs
 
     systemctl status db app web batch
+
+## Connecting to a Hub
+
+    docker exec -it tunnel ssh -p <port> localhost
