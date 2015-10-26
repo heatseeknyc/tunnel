@@ -20,7 +20,7 @@ def transmit_temperature(temperature):
     logging.info('POSTing {}...'.format(reading))
     response = requests.post('http://heatseeknyc.com/readings.json',
                              json=dict(reading=reading))
-    if response.status_code == 200:
+    if response.status_code == requests.codes.ok:
         return True
     else:
         logging.error('request %s got %s response %s',
