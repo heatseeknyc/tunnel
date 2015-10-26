@@ -7,7 +7,7 @@ Requires=tunnel.service
 [Service]
 TimeoutStartSec=0
 ExecStartPre=-/usr/bin/docker rm -f app
-ExecStart=/usr/bin/docker run --name app --link db app
+ExecStart=/usr/bin/docker run --name app --link db --link tunnel app
 ExecStop=/usr/bin/docker stop app
 
 [Install]
