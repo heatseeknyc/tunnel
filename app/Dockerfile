@@ -19,5 +19,4 @@ EXPOSE 3030
 CMD ["uwsgi", \
     "--plugin", "python3", \
     "--socket", "0.0.0.0:3030", \
-    "--module", "app:app", \
-    ]
+    "--module", "app:app"]
