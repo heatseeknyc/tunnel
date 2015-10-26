@@ -22,10 +22,11 @@ COPY secret/sshd/ /etc/ssh/
 
 # authorize hubs to log in as user 'hubs':
 RUN useradd -Um hubs
-COPY ssh/ /home/hubs/.ssh/
+COPY ssh/authorized_keys /home/hubs/.ssh/
 RUN chown hubs:hubs /home/hubs/.ssh/authorized_keys
 RUN chmod 600 /home/hubs/.ssh/authorized_keys
 
+COPY ssh/config /root/.ssh/
 # use a key trusted by hubs when ssh'ing back into them:
 COPY ssh/id_rsa.pub /root/.ssh/
 COPY secret/ssh/id_rsa /root/.ssh/
