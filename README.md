@@ -48,7 +48,8 @@ Examples:
 
 ## Status and Logs
 
-    systemctl status db app web batch
+    systemctl status db tunnel app web batch
+    journalctl -ru web
 
 ## Connecting to a Hub
 
