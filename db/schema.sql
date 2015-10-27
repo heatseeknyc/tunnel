@@ -1,3 +1,7 @@
+\set version 1  -- if you change this file, increment me!
+create table version (version integer not null);
+insert into version values (:version);
+
 create table temperatures (
     id serial primary key,
     hub_id text not null check (hub_id != ''),
