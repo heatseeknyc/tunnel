@@ -21,6 +21,7 @@ create table hubs (
     hub_id text not null check (hub_id != ''),
     pi_id text not null check (pi_id != ''),
     sleep_period integer not null,
+    version text check (version != ''),
     port integer,
     time timestamp with time zone not null default now()
 );

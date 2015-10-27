@@ -26,7 +26,7 @@ def old_hubs_post():
 def hubs():
     cursor = db.cursor()
     # select most recent row for each hub, and join on short id:
-    cursor.execute('select distinct on (hub_id) hub_id, short_id, sleep_period, port, time'
+    cursor.execute('select distinct on (hub_id) hub_id, short_id, sleep_period, version, port, time'
                    ' from hubs left join xbees on xbees.id=hub_id'
                    ' order by hub_id, time desc')
     hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
@@ -52,9 +52,10 @@ class Hub(flask.views.MethodView):
     def put(id):
         hub = flask.request.form.copy()
         hub['id'] = id
-        if not hub.get('port'): hub['port'] = None  # missing or empty => null
-        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, port)'
-                            ' values (%(id)s, %(pi)s, %(sp)s, %(port)s)', hub)
+        for k in ('v', 'port'):  # optional parameters
+            if not hub.get(k): hub[k] = None  # missing or empty => null
+        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, version, port)'
+                            ' values (%(id)s, %(pi)s, %(sp)s, %(v)s, %(port)s)', hub)
         return 'ok'
 
     @staticmethod
