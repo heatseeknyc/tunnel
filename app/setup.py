@@ -38,7 +38,7 @@ def setup_hub(id):
     return flask.render_template('setup/hub.html',
                                  hub_id=common.get_xbee_id(id, cursor),
                                  hub_partial=setup_hub_partial(id),
-                                 cells_partial=setup_hub_cells_partial(id))
+                                 cells_partial=setup_cells_partial(id))
 
 @app.route('/<id>/_hub')
 def setup_hub_partial(id):
@@ -61,7 +61,7 @@ def setup_hub_partial(id):
     return flask.render_template('setup/_hub.html', hub=hub)
 
 @app.route('/<id>/_cells')
-def setup_hub_cells_partial(id):
+def setup_cells_partial(id):
     cursor = db.cursor()
     # select most recent row for each cell of this hub, and join on short id:
     cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
