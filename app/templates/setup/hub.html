@@ -17,11 +17,11 @@
     <div class="col-md-4 col-md-offset-4">
       <div class="hub-info">
         <h3><span>Hub </span><code>{{ request.view_args.id|upper }}</code></h3>
-        <p>{{ hub_partial|safe }}</p>
+        <p id="hub-data">{{ hub_partial|safe }}</p>
       </div>
       <div class="cell-info">
         <h4>Cells</h4>
-        <ul>{{ cells_partial|safe }}</ul>
+        <ul id="cells-data">{{ cells_partial|safe }}</ul>
       </div>
       <button class="btn btn-default btn-lg btn-block" id="hourly">Switch to Hourly Readings</button>
     </div>
@@ -30,6 +30,10 @@
 {% endblock %}
 
 {% block js %}
-<script>var HUB_URL="{{ url_for('hub', id=hub_id) }}";</script>
+<script>
+var HUB_PARTIAL_URL="{{ url_for('setup_hub_partial', id=hub_id) }}";
+var CELLS_PARTIAL_URL="{{ url_for('setup_cells_partial', id=hub_id) }}";
+var HUB_URL="{{ url_for('hub', id=hub_id) }}";
+</script>
 <script src="/static/setup/hub.js"></script>
 {% endblock %}
