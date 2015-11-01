@@ -37,6 +37,10 @@ class Hub(flask.views.MethodView):
     @staticmethod
     def get(id):
         cursor = db.cursor()
+
+        if len(id) != 16:
+            return flask.redirect(flask.url_for('hub', id=common.get_xbee_id(id, cursor)))
+
         cursor.execute('select pi_id, sleep_period, port, time from hubs'
                        ' where hub_id=%s order by time desc limit 10', (id,))
         logs = cursor.fetchall()
@@ -81,6 +85,10 @@ class Hub(flask.views.MethodView):
 @app.route('/cells/<id>')
 def cell(id):
     cursor = db.cursor()
+
+    if len(id) != 16:
+        return flask.redirect(flask.url_for('cell', id=common.get_xbee_id(id, cursor)))
+
     cursor.execute('select hub_id, max(time) as time from temperatures'
                    ' where cell_id=%s group by hub_id order by time desc', (id,))
     hubs = cursor.fetchall()

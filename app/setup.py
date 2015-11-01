@@ -13,13 +13,6 @@ def route(path, name):
         return cls
     return f
 
-def get_xbee_id(id, cursor):
-    if len(id) == 16: return id  # already an xbee id
-    cursor.execute('select id from xbees where short_id=%s', (id,))
-    row = cursor.fetchone()
-    if not row: flask.abort(404)
-    return row['id']
-
 def time_since(then):
     since = datetime.now(timezone.utc) - then
     if since.days: return '{} days ago'.format(since.days)
@@ -43,14 +36,14 @@ def setup_hub(id):
         if row: return flask.redirect(flask.url_for('setup_hub', id=row['short_id']))
 
     return flask.render_template('setup/hub.html',
-                                 hub_id=get_xbee_id(id, cursor),
+                                 hub_id=common.get_xbee_id(id, cursor),
                                  hub_partial=setup_hub_partial(id),
                                  cells_partial=setup_hub_cells_partial(id))
 
 @app.route('/<id>/_hub')
 def setup_hub_partial(id):
     cursor = db.cursor()
-    hub_id = get_xbee_id(id, cursor)
+    hub_id = common.get_xbee_id(id, cursor)
     cursor.execute('select sleep_period, time from hubs where hub_id=%s'
                    ' order by time desc limit 1', (hub_id,))
     hub = cursor.fetchone()
@@ -73,7 +66,7 @@ def setup_hub_cells_partial(id):
     # select most recent row for each cell of this hub, and join on short id:
     cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
                    ' from temperatures left join xbees on xbees.id=cell_id where hub_id=%s'
-                   ' order by cell_id, time desc', (get_xbee_id(id, cursor),))
+                   ' order by cell_id, time desc', (common.get_xbee_id(id, cursor),))
     cells = [dict(id=c['short_id'] or c['cell_id'],
                   since=time_since(c['time']))
              for c in sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)]
