@@ -2,12 +2,9 @@ $(function() {
 
   function refresh() {
     $.when($.get(HUB_PARTIAL_URL), $.get(CELLS_PARTIAL_URL))
-      .done(function(hub_partial, cells_partial) {
-        console.log(hub_partial);
-        console.log(cells_partial);
-
-        $('#hub-data').html(hub_partial[0]);
-        $('#cells-data').html(cells_partial[0]);
+      .done(function(hub_response, cells_response) {
+        $('#hub-data').html(hub_response[0]);
+        $('#cells-data').html(cells_response[0]);
         refreshSoon();
       });
   }
