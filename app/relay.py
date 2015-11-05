@@ -81,6 +81,11 @@ class Hub(flask.views.MethodView):
         response.raise_for_status()
         return 'ok'
 
+# PATCHing doesn't play well with Chrome Data Compression Proxy, so we fake it with POST:
+@app.route('/hubs/<id>/patch', methods=('POST',))
+def hub_patch(id):
+    return Hub.patch(id)
+
 
 @app.route('/cells/<id>')
 def cell(id):
