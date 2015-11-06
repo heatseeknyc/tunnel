@@ -5,7 +5,8 @@ Requires=docker.service
 [Service]
 TimeoutStartSec=0
 ExecStartPre=-/usr/bin/docker rm -f db
-ExecStart=/usr/bin/docker run --name db --volumes-from db-data db
+ExecStartPre=/usr/bin/docker run -d --name db --volumes-from db-data db
+ExecStart=/usr/bin/docker logs -f db
 ExecStop=/usr/bin/docker stop db
 
 [Install]

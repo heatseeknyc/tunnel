@@ -5,7 +5,8 @@ Requires=db.service
 [Service]
 TimeoutStartSec=0
 ExecStartPre=-/usr/bin/docker rm -f batch
-ExecStart=/usr/bin/docker run --name batch --link db app python3 -m app.batch
+ExecStartPre=/usr/bin/docker run -d --name batch --link db app python3 -m app.batch
+ExecStart=/usr/bin/docker logs -f batch
 ExecStop=/usr/bin/docker stop batch
 
 [Install]

@@ -5,7 +5,8 @@ Requires=docker.service
 [Service]
 TimeoutStartSec=0
 ExecStartPre=-/usr/bin/docker rm -f tunnel
-ExecStart=/usr/bin/docker run --name tunnel -p 22:22 tunnel
+ExecStartPre=/usr/bin/docker run -d --name tunnel -p 22:22 tunnel
+ExecStart=/usr/bin/docker logs -f tunnel
 ExecStop=/usr/bin/docker stop tunnel
 
 [Install]
