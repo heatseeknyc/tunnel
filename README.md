@@ -20,7 +20,13 @@ Examples:
 
 # Production, on CoreOS
 
+## Connecting
+
 `ssh -p 2222 core@setup.heatseeknyc.com`
+
+### Adding an SSH Key
+
+`update-ssh-keys -a <name> < key.pem`
 
 ## Initial Setup
 ```bash
