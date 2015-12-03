@@ -46,9 +46,10 @@ class Hub(flask.views.MethodView):
         cursor.execute('select pi_id, sleep_period, disk_free, uptime, version, port, time from hubs'
                        ' where hub_id=%s order by time desc limit 10', (id,))
         logs = cursor.fetchall()
-        cursor.execute('select cell_id, max(time) as time from temperatures'
-                       ' where hub_id=%s group by cell_id order by time desc', (id,))
-        cells = cursor.fetchall()
+        cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
+                       ' from temperatures left join xbees on xbees.id=cell_id'
+                       ' where hub_id=%s order by cell_id, time desc', (id,))
+        cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
         cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where hub_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
@@ -99,9 +100,10 @@ def cell(id):
     if len(id) != 16:
         return flask.redirect(flask.url_for('cell', id=common.get_xbee_id(id, cursor)))
 
-    cursor.execute('select hub_id, max(time) as time from temperatures'
-                   ' where cell_id=%s group by hub_id order by time desc', (id,))
-    hubs = cursor.fetchall()
+    cursor.execute('select distinct on (hub_id) hub_id, short_id, time'
+                   ' from temperatures left join xbees on xbees.id=hub_id'
+                   ' where cell_id=%s order by hub_id, time desc', (id,))
+    hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
     cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
                    ' from temperatures where cell_id=%s order by hub_time desc limit 100', (id,))
     temperatures = cursor.fetchall()
