@@ -21,7 +21,8 @@ def route(path, name):
 def hubs():
     cursor = db.cursor()
     # select most recent row for each hub, and join on short id:
-    cursor.execute('select distinct on (hub_id) hub_id, short_id, sleep_period, version, port, time'
+    cursor.execute('select distinct on (hub_id)'
+                   ' hub_id, short_id, sleep_period, disk_free, uptime, version, port, time'
                    ' from hubs left join xbees on xbees.id=hub_id'
                    ' order by hub_id, time desc')
     hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
@@ -36,7 +37,7 @@ class Hub(flask.views.MethodView):
         if len(id) != 16:
             return flask.redirect(flask.url_for('hub', id=common.get_xbee_id(id, cursor)))
 
-        cursor.execute('select pi_id, sleep_period, port, time from hubs'
+        cursor.execute('select pi_id, sleep_period, disk_free, uptime, version, port, time from hubs'
                        ' where hub_id=%s order by time desc limit 10', (id,))
         logs = cursor.fetchall()
         cursor.execute('select cell_id, max(time) as time from temperatures'
@@ -51,10 +52,12 @@ class Hub(flask.views.MethodView):
     def put(id):
         hub = flask.request.form.copy()
         hub['id'] = id
-        for k in ('v', 'port'):  # optional parameters
+        for k in ('free', 'up', 'v', 'port'):  # optional parameters
             if not hub.get(k): hub[k] = None  # missing or empty => null
-        db.cursor().execute('insert into hubs (hub_id, pi_id, sleep_period, version, port)'
-                            ' values (%(id)s, %(pi)s, %(sp)s, %(v)s, %(port)s)', hub)
+        db.cursor().execute('insert into hubs'
+                            ' (hub_id, pi_id, sleep_period, disk_free, uptime, version, port)'
+                            ' values (%(id)s, %(pi)s, %(sp)s, %(free)s, %(up)s, %(v)s, %(port)s)',
+                            hub)
         return 'ok'
 
     @staticmethod

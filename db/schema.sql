@@ -1,4 +1,4 @@
-\set version 1  -- if you change this file, increment me!
+\set version 2  -- if you change this file, increment me!
 create table version (version integer not null);
 insert into version values (:version);
 
@@ -21,8 +21,14 @@ create table hubs (
     hub_id text not null check (hub_id != ''),
     pi_id text not null check (pi_id != ''),
     sleep_period integer not null,
+
+    -- always present in newer firmwares, but absent in older ones:
+    disk_free integer,
+    uptime real,
     version text check (version != ''),
-    port integer,
+
+    port integer, -- optional
+
     time timestamp with time zone not null default now()
 );
 create index on hubs (hub_id, time desc);
