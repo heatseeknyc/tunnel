@@ -3,6 +3,11 @@
 {% block title %}Cell {{ request.view_args.id }}{% endblock %}
 
 {% block body %}
+<h1>
+  Cell <code>{{ request.view_args.id }}</code>
+  {% if short_id %}(<code>{{ short_id }}</code>){% endif %}
+</h1>
+
 <h2>Hubs</h2>
 <ul>
   {% for h in hubs %}

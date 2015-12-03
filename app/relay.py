@@ -10,6 +10,12 @@ import requests
 from . import app, common, db
 
 
+def get_short_id(xbee_id, cursor):
+    cursor.execute('select short_id from xbees where id=%s', (xbee_id,))
+    row = cursor.fetchone()
+    if row: return row['short_id']
+
+
 def route(path, name):
     """decorator to add a route to a View class"""
     def f(cls):
@@ -46,7 +52,8 @@ class Hub(flask.views.MethodView):
         cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where hub_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
-        return flask.render_template('relay/hub.html', hubs=logs, cells=cells, temperatures=temperatures)
+        return flask.render_template('relay/hub.html', short_id=get_short_id(id, cursor),
+                                     hubs=logs, cells=cells, temperatures=temperatures)
 
     @staticmethod
     def put(id):
@@ -98,7 +105,8 @@ def cell(id):
     cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
                    ' from temperatures where cell_id=%s order by hub_time desc limit 100', (id,))
     temperatures = cursor.fetchall()
-    return flask.render_template('relay/cell.html', hubs=hubs, temperatures=temperatures)
+    return flask.render_template('relay/cell.html', short_id=get_short_id(id, cursor),
+                                 hubs=hubs, temperatures=temperatures)
 
 @route('/temperatures/', 'temperatures')
 class Temperatures(flask.views.MethodView):

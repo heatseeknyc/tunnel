@@ -6,13 +6,6 @@ import flask
 from . import app, common, db
 
 
-def route(path, name):
-    """decorator to add a route to a View class"""
-    def f(cls):
-        app.add_url_rule(path, view_func=cls.as_view(name))
-        return cls
-    return f
-
 def time_since(then):
     since = datetime.now(timezone.utc) - then
     if since.days: return '{} days ago'.format(since.days)

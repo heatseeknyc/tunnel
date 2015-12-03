@@ -3,6 +3,11 @@
 {% block title %}Hub {{ request.view_args.id }}{% endblock %}
 
 {% block body %}
+<h1>
+  Hub <code>{{ request.view_args.id }}</code>
+  {% if short_id %}(<code>{{ short_id }}</code>){% endif %}
+</h1>
+
 <h2>Status</h2>
 <ul>{% include 'relay/_hubs.html' %}</ul>
 
