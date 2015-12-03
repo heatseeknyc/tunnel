@@ -45,7 +45,7 @@ class Hub(flask.views.MethodView):
         cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where hub_id=%s order by hub_time desc limit 100', (id,))
         temperatures = cursor.fetchall()
-        return flask.render_template('relay/hub.html', logs=logs, cells=cells, temperatures=temperatures)
+        return flask.render_template('relay/hub.html', hubs=logs, cells=cells, temperatures=temperatures)
 
     @staticmethod
     def put(id):

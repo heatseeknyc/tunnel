@@ -1,0 +1,11 @@
+{% for h in hubs %}
+<li>
+  {{ h.time }}
+  {% if h.hub_id %}<a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>{% endif %}
+  {% if h.pi_id %}<code>{{ h.pi_id }}</code>{% endif %}
+  {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
+  {% if h.version %}<code>{{ h.version }}</code>{% endif %}
+  <i>{{ h.sleep_period }}</i>
+  <b>{{ h.port }}</b>
+</li>
+{% endfor %}

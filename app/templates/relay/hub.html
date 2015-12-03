@@ -4,11 +4,7 @@
 
 {% block body %}
 <h2>Status</h2>
-<ul>
-  {% for l in logs %}
-  <li>{{ l.time }} <code>{{ l.pi_id }}</code> <i>{{ l.sleep_period }}</i> <b>{{ l.port }}</b></li>
-  {% endfor %}
-</ul>
+<ul>{% include 'relay/_hubs.html' %}</ul>
 
 <h2>Cells</h2>
 <ul>

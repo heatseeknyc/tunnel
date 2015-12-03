@@ -1,12 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Hubs{% endblock %}
 {% block body %}
-<ul>
-  {% for h in hubs %}
-  <li>{{ h.time }} <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>
-    {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
-    {% if h.version %}<code>{{ h.version }}</code>{% endif %}
-    <i>{{ h.sleep_period }}</i> <b>{{ h.port }}</b></li>
-  {% endfor %}
-</ul>
+<ul>{% include 'relay/_hubs.html' %}</ul>
 {% endblock %}
