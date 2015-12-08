@@ -1,14 +1,16 @@
 <table>
-{% for h in hubs %}
-  <th>Time</th>
-  <th>Hub ID</th>
-  <th>Pi ID</th>
-  <th>Short ID</th>
-  <th>Disk Free</th>
-  <th>Uptime</th>
-  <th>Version</th>
-  <th>Sleep Period</th>
-  <th>Port</th>
+  <tr>
+    <th>Time</th>
+    <th>Hub ID</th>
+    <th>Pi ID</th>
+    <th>Short ID</th>
+    <th>Disk Free</th>
+    <th>Uptime</th>
+    <th>Version</th>
+    <th>Sleep Period</th>
+    <th>Port</th>
+  </tr>
+  {% for h in hubs %}
   <tr>
     <td>{{ h.time }}</td>
     <td>
