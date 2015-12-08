@@ -1,16 +1,17 @@
 <table>
+  {% for h in hubs %}
+  {% if loop.first %}
   <tr>
     <th>Time</th>
-    <th>Hub ID</th>
-    <th>Pi ID</th>
-    <th>Short ID</th>
+    <th>{% if h.hub_id is defined %}XBee{% endif %}</th>
+    <th>{% if h.pi_id is defined %}Pi ID{% endif %}</th>
     <th>Disk Free</th>
     <th>Uptime</th>
     <th>Version</th>
     <th>Sleep Period</th>
     <th>Port</th>
   </tr>
-  {% for h in hubs %}
+  {% endif %}
   <tr>
     <td>{{ h.time }}</td>
     <td>
@@ -19,9 +20,9 @@
         <code>{{ h.hub_id }}</code>
       </a>
       {% endif %}
+      {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
     </td>
     <td>{% if h.pi_id %}<code>{{ h.pi_id }}</code>{% endif %}</td>
-    <td>{% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}</td>
     <td>{% if h.disk_free %}{{ h.disk_free }}B{% endif %}</td>
     <td>{% if h.uptime %}{{ h.uptime }}s{% endif %}</td>
     <td>{% if h.version %}<code>{{ h.version }}</code>{% endif %}</td>
