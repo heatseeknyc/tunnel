@@ -1,13 +1,33 @@
-{% for h in hubs %}
-<li>
-  {{ h.time }}
-  {% if h.hub_id %}<a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>{% endif %}
-  {% if h.pi_id %}<code>{{ h.pi_id }}</code>{% endif %}
-  {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
-  {% if h.disk_free %}{{ h.disk_free }}B{% endif %}
-  {% if h.uptime %}{{ h.uptime }}s{% endif %}
-  {% if h.version %}<code>{{ h.version }}</code>{% endif %}
-  <i>{{ h.sleep_period }}</i>
-  <b>{{ h.port }}</b>
-</li>
-{% endfor %}
+<table>
+  {% for h in hubs %}
+  {% if loop.first %}
+  <tr>
+    <th>Time</th>
+    <th>{% if h.hub_id is defined %}XBee{% endif %}</th>
+    <th>{% if h.pi_id is defined %}Pi ID{% endif %}</th>
+    <th>Disk Free</th>
+    <th>Uptime</th>
+    <th>Version</th>
+    <th>Sleep Period</th>
+    <th>Port</th>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{{ h.time }}</td>
+    <td>
+      {% if h.hub_id %}
+      <a href="{{ url_for('hub', id=h.hub_id) }}">
+        <code>{{ h.hub_id }}</code>
+      </a>
+      {% endif %}
+      {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
+    </td>
+    <td>{% if h.pi_id %}<code>{{ h.pi_id }}</code>{% endif %}</td>
+    <td>{% if h.disk_free %}{{ h.disk_free }}B{% endif %}</td>
+    <td>{% if h.uptime %}{{ h.uptime }}s{% endif %}</td>
+    <td>{% if h.version %}<code>{{ h.version }}</code>{% endif %}</td>
+    <td><i>{{ h.sleep_period }}</i></td>
+    <td><b>{{ h.port }}</b></td>
+  </tr>
+  {% endfor %}
+</table>
