@@ -23,6 +23,11 @@ def route(path, name):
         return cls
     return f
 
+# convert old hub firmware's POSTs to /hubs to PUTs to /hubs/<id>:
+@app.route('/hubs', methods=('POST',))
+def old_hubs_post():
+    return Hub.put(flask.request.form['hub'])
+
 @app.route('/hubs/')
 def hubs():
     cursor = db.cursor()
@@ -109,6 +114,11 @@ def cell(id):
     temperatures = cursor.fetchall()
     return flask.render_template('relay/cell.html', short_id=get_short_id(id, cursor),
                                  hubs=hubs, temperatures=temperatures)
+
+# old hub firmware doesn't use a trailing slash:
+@app.route('/temperatures', methods=('POST',))
+def old_temperatures_post():
+    return Temperatures.post()
 
 @route('/temperatures/', 'temperatures')
 class Temperatures(flask.views.MethodView):
