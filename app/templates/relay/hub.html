@@ -12,15 +12,20 @@
 <ul>{% include 'relay/_hubs.html' %}</ul>
 
 <h2>Cells</h2>
-<ul>
+<table>
+  <th>Time</th>
+  <th>ID</th>
+  <th>Short ID</th>
   {% for c in cells %}
-  <li>
-    {{ c.time }}
-    <a href="{{ url_for('cell', id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a>
-    {% if c.short_id %}(<code>{{ c.short_id }}</code>){% endif %}
-  </li>
+  <tr>{{ c.time }}</tr>
+  <tr>
+    <a href="{{ url_for('cell', id=c.cell_id) }}">
+      <code>{{ c.cell_id }}</code>
+    </a>
+  </tr>
+  <tr>{% if c.short_id %}(<code>{{ c.short_id }}</code>){% endif %}</tr>
   {% endfor %}
-</ul>
+</table>
 
 <h2 id="temperatures">Temperatures</h2>
 <ul>{% include 'relay/_temperatures.html' %}</ul>

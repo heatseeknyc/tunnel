@@ -9,15 +9,18 @@
 </h1>
 
 <h2>Hubs</h2>
-<ul>
+<table>
+  <th>Time</th>
+  <th>ID</th>
+  <th>Short ID</th>
   {% for h in hubs %}
-  <li>
-    {{ h.time }}
+  <tr>{{ h.time }}</tr>
+  <tr>
     <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>
-    {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
-  </li>
+  </tr>
+  <tr>{% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}</tr>
   {% endfor %}
-</ul>
+</table>
 
 <h2 id="temperatures">Temperatures</h2>
 <ul>{% include 'relay/_temperatures.html' %}</ul>
