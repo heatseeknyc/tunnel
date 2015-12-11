@@ -5,19 +5,24 @@
 {% block body %}
 <h1>
   Cell <code>{{ request.view_args.id }}</code>
-  {% if short_id %}(<code>{{ short_id }}</code>){% endif %}
+  {% if short_id %}/ <code>{{ short_id }}</code>{% endif %}
 </h1>
 
 <h2>Hubs</h2>
-<ul>
+<table>
+  <tr>
+    <th>Time</th>
+    <th>ID</th>
+    <th>Short ID</th>
+  </tr>
   {% for h in hubs %}
-  <li>
-    {{ h.time }}
-    <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>
-    {% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}
-  </li>
+  <tr>
+    <td>{{ h.time }}</td>
+    <td><a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a></td>
+    <td>{% if h.short_id %}<code>{{ h.short_id }}</code>{% endif %}</td>
+  </tr>
   {% endfor %}
-</ul>
+</table>
 
 <h2 id="temperatures">Temperatures</h2>
 <ul>{% include 'relay/_temperatures.html' %}</ul>
