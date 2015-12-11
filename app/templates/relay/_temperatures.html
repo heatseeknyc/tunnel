@@ -1,11 +1,13 @@
 <table>
-  <th>Hub Time</th>
-  <th>Hub ID</th>
-  <th>Cell ID</th>
-  <th>Temperature</th>
-  <th>Sleep Period</th>
-  <th>Taken At</th>
-  <th>Relayed At</th>
+  <tr>
+    <th>Hub Time</th>
+    <th>Hub ID</th>
+    <th>Cell ID</th>
+    <th>Temperature</th>
+    <th>Sleep Period</th>
+    <th>Taken At</th>
+    <th>Relayed At</th>
+  </tr>
   {% for t in temperatures %}
   <tr>{{ t.hub_time }}</tr>
   <tr><code>{{ t.hub_id }}</code></tr>
