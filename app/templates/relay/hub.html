@@ -5,7 +5,7 @@
 {% block body %}
 <h1>
   Hub <code>{{ request.view_args.id }}</code>
-  {% if short_id %}(<code>{{ short_id }}</code>){% endif %}
+  {% if short_id %} / <code>{{ short_id }}</code>{% endif %}
 </h1>
 
 <h2>Status</h2>
@@ -21,12 +21,8 @@
   {% for c in cells %}
   <tr>
     <td>{{ c.time }}</td>
-    <td>
-      <a href="{{ url_for('cell', id=c.cell_id) }}">
-        <code>{{ c.cell_id }}</code>
-      </a>
-    </td>
-    <td>{% if c.short_id %}(<code>{{ c.short_id }}</code>){% endif %}</td>
+    <td><a href="{{ url_for('cell', id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a></td>
+    <td>{% if c.short_id %}<code>{{ c.short_id }}</code>{% endif %}</td>
   </tr>
   {% endfor %}
 </table>

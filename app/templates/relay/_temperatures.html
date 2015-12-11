@@ -1,26 +1,24 @@
 <table>
+  {% for t in temperatures %}
+  {% if loop.first %}
   <tr>
-    <th>Hub Time</th>
-    <th>Hub ID</th>
-    <th>Cell ID</th>
+    <th>Taken At</th>
+    <th>{% if t.hub_id is defined %}Hub ID{% endif %}</th>
+    <th>{% if t.cell_id is defined %}Cell ID{% endif %}</th>
     <th>Temperature</th>
     <th>Sleep Period</th>
     <th>Received At</th>
     <th>Relayed At</th>
   </tr>
-  {% for t in temperatures %}
+  {% endif %}
   <tr>
     <td>{{ t.hub_time }}</td>
-    <td><code>{{ t.hub_id }}</code></td>
-    <td><code>{{ t.cell_id }}</code></td>
+    <td>{% if t.hub_id %}<code>{{ t.hub_id }}</code>{% endif %}</td>
+    <td>{% if t.cell_id %}<code>{{ t.cell_id }}</code>{% endif %}</td>
     <td>
-      {% if t.relay %}
-      <b>{{ t.temperature }}&deg;</b>
-      {% else %}
-      <s>{{ t.temperature }}&deg;</s>
-      {% endif %}
+      {% if t.relay %}{{ t.temperature }}&deg;{% else %}<s>{{ t.temperature }}&deg;</s>{% endif %}
     </td>
-    <td><i>{{ t.sleep_period }}</i></td>
+    <td>{{ t.sleep_period }}</td>
     <td>{{ t.time }}</td>
     <td>{% if t.relayed_time %}{{ t.relayed_time }}{% endif %}</td>
   </tr>
