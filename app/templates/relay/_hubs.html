@@ -1,15 +1,17 @@
 <table>
+  {% for h in hubs %}
+  {% if loop.first %}
   <tr>
     <th>Time</th>
-    <th>Hub ID</th>
-    <th>Pi ID</th>
+    <th>{% if h.hub_id is defined %}XBee{% endif %}</th>
+    <th>{% if h.pi_id is defined %}Pi ID{% endif %}</th>
     <th>Disk Free</th>
     <th>Uptime</th>
     <th>Version</th>
     <th>Sleep Period</th>
     <th>Port</th>
   </tr>
-  {% for h in hubs %}
+  {% endif %}
   <tr>
     <td>{{ h.time }}</td>
     <td>
