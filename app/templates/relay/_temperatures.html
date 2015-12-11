@@ -9,18 +9,20 @@
     <th>Relayed At</th>
   </tr>
   {% for t in temperatures %}
-  <tr>{{ t.hub_time }}</tr>
-  <tr><code>{{ t.hub_id }}</code></tr>
-  <tr><code>{{ t.cell_id }}</code></tr>
   <tr>
-  {% if t.relay %}
-    <b>{{ t.temperature }}&deg;</b>
-  {% else %}
-    <s>{{ t.temperature }}&deg;</s>
-  {% endif %}
+    <td>{{ t.hub_time }}</td>
+    <td><code>{{ t.hub_id }}</code></td>
+    <td><code>{{ t.cell_id }}</code></td>
+    <td>
+      {% if t.relay %}
+      <b>{{ t.temperature }}&deg;</b>
+      {% else %}
+      <s>{{ t.temperature }}&deg;</s>
+      {% endif %}
+    </td>
+    <td><i>{{ t.sleep_period }}</i></td>
+    <td>{{ t.time }}</td>
+    <td>{% if t.relayed_time %}{{ t.relayed_time }}{% endif %}</td>
   </tr>
-  <tr><i>{{ t.sleep_period }}</i></tr>
-  <tr>{{ t.time }}</tr>
-  <tr>{% if t.relayed_time %}{{ t.relayed_time }}{% endif %}</tr>
   {% endfor %}
 </table>

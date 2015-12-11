@@ -16,11 +16,13 @@
     <th>Short ID</th>
   </tr>
   {% for h in hubs %}
-  <tr>{{ h.time }}</tr>
   <tr>
-    <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>
+    <td>{{ h.time }}</td>
+    <td>
+      <a href="{{ url_for('hub', id=h.hub_id) }}"><code>{{ h.hub_id }}</code></a>
+    </td>
+    <td>{% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}</td>
   </tr>
-  <tr>{% if h.short_id %}(<code>{{ h.short_id }}</code>){% endif %}</tr>
   {% endfor %}
 </table>
 

@@ -19,13 +19,15 @@
     <th>Short ID</th>
   </tr>
   {% for c in cells %}
-  <tr>{{ c.time }}</tr>
   <tr>
-    <a href="{{ url_for('cell', id=c.cell_id) }}">
-      <code>{{ c.cell_id }}</code>
-    </a>
+    <td>{{ c.time }}</td>
+    <td>
+      <a href="{{ url_for('cell', id=c.cell_id) }}">
+        <code>{{ c.cell_id }}</code>
+      </a>
+    </td>
+    <td>{% if c.short_id %}(<code>{{ c.short_id }}</code>){% endif %}</td>
   </tr>
-  <tr>{% if c.short_id %}(<code>{{ c.short_id }}</code>){% endif %}</tr>
   {% endfor %}
 </table>
 
