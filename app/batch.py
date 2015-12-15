@@ -20,12 +20,10 @@ def transmit_temperature(temperature):
     logging.info('POSTing {}...'.format(reading))
     response = requests.post('http://heatseeknyc.com/readings.json',
                              json=dict(reading=reading))
-    if response.status_code == requests.codes.ok:
-        return True
-    else:
+    if response.status_code != requests.codes.ok:
         logging.error('request %s got %s response %s',
                       response.request.body, response.status_code, response.text)
-        return False
+    return response.status_code
 
 
 def transmit():
@@ -39,16 +37,18 @@ def transmit():
             temperatures = cursor.fetchall()
         if temperatures: logging.info('%s unrelayed temperatures', len(temperatures))
 
-        failed_cell_ids = set()
+        unknown_cell_ids = set()
         for temperature in temperatures:
             cell_id = temperature['cell_id']
-            if cell_id not in failed_cell_ids:
-                if transmit_temperature(temperature):
+            if cell_id not in unknown_cell_ids:
+                status = transmit_temperature(temperature)
+                if status == requests.codes.ok:
                     with database:
                         database.cursor().execute('update temperatures set relayed_time = now()'
                                                   ' where id=%(id)s', temperature)
-                else:
-                    failed_cell_ids.add(cell_id)
+                elif status == requests.codes.not_found:
+                    # give up on this cell's readings for this batch, since it will continue to 404
+                    unknown_cell_ids.add(cell_id)
                 time.sleep(1)
 
         time.sleep(1)
