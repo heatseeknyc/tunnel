@@ -1,4 +1,4 @@
-\set version 2  -- if you change this file, increment me!
+\set version 3  -- if you change this file, increment me!
 create table version (version integer not null);
 insert into version values (:version);
 
@@ -6,7 +6,12 @@ create table temperatures (
     id serial primary key,
     hub_id text not null check (hub_id != ''),
     cell_id text not null check (cell_id != ''),
-    temperature real not null,
+
+    -- new firmware sends adc, old firmware sends temperature:
+    adc integer,
+    temperature real,
+    constraint adc_or_temperature check (adc is null != temperature is null),
+
     sleep_period integer not null,
     relay boolean not null,
     hub_time timestamp with time zone not null,

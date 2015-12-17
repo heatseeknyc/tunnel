@@ -15,6 +15,11 @@ def get_short_id(xbee_id, cursor):
     row = cursor.fetchone()
     if row: return row['short_id']
 
+def with_temperatures(rows):
+    for row in rows:
+        common.add_temperature(row)
+    return rows
+
 
 def route(path, name):
     """decorator to add a route to a View class"""
@@ -55,9 +60,9 @@ class Hub(flask.views.MethodView):
                        ' from temperatures left join xbees on xbees.id=cell_id'
                        ' where hub_id=%s order by cell_id, time desc', (id,))
         cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
-        cursor.execute('select cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
+        cursor.execute('select cell_id, adc, temperature, sleep_period, relay, hub_time, time, relayed_time from temperatures'
                        ' where hub_id=%s order by hub_time desc limit 100', (id,))
-        temperatures = cursor.fetchall()
+        temperatures = with_temperatures(cursor.fetchall())
         return flask.render_template('relay/hub.html', short_id=get_short_id(id, cursor),
                                      hubs=logs, cells=cells, temperatures=temperatures)
 
@@ -109,9 +114,9 @@ def cell(id):
                    ' from temperatures left join xbees on xbees.id=hub_id'
                    ' where cell_id=%s order by hub_id, time desc', (id,))
     hubs = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
-    cursor.execute('select hub_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
+    cursor.execute('select hub_id, adc, temperature, sleep_period, relay, hub_time, time, relayed_time'
                    ' from temperatures where cell_id=%s order by hub_time desc limit 100', (id,))
-    temperatures = cursor.fetchall()
+    temperatures = with_temperatures(cursor.fetchall())
     return flask.render_template('relay/cell.html', short_id=get_short_id(id, cursor),
                                  hubs=hubs, temperatures=temperatures)
 
@@ -125,15 +130,22 @@ class Temperatures(flask.views.MethodView):
     @staticmethod
     def get():
         cursor = db.cursor()
-        cursor.execute('select hub_id, cell_id, temperature, sleep_period, relay, hub_time, time, relayed_time'
+        cursor.execute('select hub_id, cell_id, adc, temperature, sleep_period, relay, hub_time, time, relayed_time'
                        ' from temperatures order by hub_time desc limit 100')
-        return flask.render_template('relay/temperatures.html', temperatures=cursor.fetchall())
+        temperatures = with_temperatures(cursor.fetchall())
+        return flask.render_template('relay/temperatures.html', temperatures=temperatures)
 
     @staticmethod
     def post():
         d = flask.request.form.copy()
         d['time'] = datetime.fromtimestamp(int(d['time']))
         d['relay'] = int(d['sp']) == common.LIVE_SLEEP_PERIOD
-        db.cursor().execute('insert into temperatures (hub_id, cell_id, temperature, sleep_period, relay, hub_time)'
-                            ' values (%(hub)s, %(cell)s, %(temp)s, %(sp)s, %(relay)s, %(time)s)', d)
+
+        for k in ('adc', 'temp'):  # optional parameters
+            if not d.get(k): d[k] = None  # missing or empty => null
+        if bool(d['adc']) == bool(d['temp']):
+            return 'must pass exactly one of adc or temp', 400
+
+        db.cursor().execute('insert into temperatures (hub_id, cell_id, adc, temperature, sleep_period, relay, hub_time)'
+                            ' values (%(hub)s, %(cell)s, %(adc)s, %(temp)s, %(sp)s, %(relay)s, %(time)s)', d)
         return 'ok'

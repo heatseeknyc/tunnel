@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 def transmit_temperature(temperature):
     """Transmit a single temperature to heatseeknyc.com."""
+    common.add_temperature(temperature)
     reading = dict(sensor_name=temperature['cell_id'],
                    temp=temperature['temperature'],
                    time=temperature['hub_time'].timestamp(),
