@@ -19,5 +19,5 @@ def teardown_request(exception):
         db.commit()
 
 
-from . import setup
-from . import relay
+from .views import setup
+from .views import relay

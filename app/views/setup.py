@@ -3,7 +3,7 @@ import operator
 
 import flask
 
-from . import app, common, db
+from .. import app, common, db
 
 
 def time_since(then):

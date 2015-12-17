@@ -7,7 +7,7 @@ import flask
 import flask.views
 import requests
 
-from . import app, common, db
+from .. import app, common, db
 
 
 def get_short_id(xbee_id, cursor):
