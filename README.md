@@ -64,3 +64,7 @@ Examples:
 ## Connecting to a Hub
 
     docker exec -it tunnel ssh -p <port> localhost
+
+## Debugging Tunnel Ports
+
+    docker exec tunnel netstat -a | grep ssh
