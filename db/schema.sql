@@ -1,4 +1,4 @@
-\set version 3  -- if you change this file, increment me!
+\set version 4  -- if you change this file, increment me!
 create table version (version integer not null);
 insert into version values (:version);
 
@@ -38,7 +38,12 @@ create table hubs (
 );
 create index on hubs (hub_id, time desc);
 
+create table cells (
+    id text unique not null check (id != ''),
+    version text not null check (version != '')
+);
+
 create table xbees (
-    id text unique not null,
-    short_id text unique not null
+    id text unique not null check (id != ''),
+    short_id text unique not null check (short_id != '')
 );
