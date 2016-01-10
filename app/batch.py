@@ -33,7 +33,7 @@ def transmit():
     while True:
         with database:
             cursor = database.cursor()
-            cursor.execute('select cell_id, adc, temperature, hub_time, version'
+            cursor.execute('select id, cell_id, adc, temperature, hub_time, version'
                            ' from temperatures left join cells on cells.id=cell_id'
                            ' where relay and relayed_time is null')
             temperatures = cursor.fetchall()
