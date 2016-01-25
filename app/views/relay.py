@@ -56,8 +56,8 @@ class Hub(flask.views.MethodView):
         cursor.execute('select pi_id, sleep_period, disk_free, uptime, version, port, time from hubs'
                        ' where hub_id=%s order by time desc limit 10', (id,))
         logs = cursor.fetchall()
-        cursor.execute('select distinct on (cell_id) cell_id, short_id, time'
-                       ' from temperatures left join xbees on xbees.id=cell_id'
+        cursor.execute('select distinct on (cell_id) cell_id, short_id, version, time'
+                       ' from temperatures left join xbees on xbees.id=cell_id left join cells on cells.id=cell_id'
                        ' where hub_id=%s order by cell_id, time desc', (id,))
         cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
         cursor.execute('select cell_id, adc, temperature, sleep_period, relay, hub_time, time, relayed_time, version'
@@ -111,6 +111,8 @@ def cell(id):
     if len(id) != 16:
         return flask.redirect(flask.url_for('cell', id=common.get_xbee_id(id, cursor)))
 
+    cursor.execute('select version from cells where id=%s', (id,))
+    cell = cursor.fetchone()
     cursor.execute('select distinct on (hub_id) hub_id, short_id, time'
                    ' from temperatures left join xbees on xbees.id=hub_id'
                    ' where cell_id=%s order by hub_id, time desc', (id,))
@@ -120,7 +122,7 @@ def cell(id):
                    ' where cell_id=%s order by hub_time desc limit 100', (id,))
     temperatures = with_temperatures(cursor.fetchall())
     return flask.render_template('relay/cell.html', short_id=get_short_id(id, cursor),
-                                 hubs=hubs, temperatures=temperatures)
+                                 cell=cell, hubs=hubs, temperatures=temperatures)
 
 # old hub firmware doesn't use a trailing slash:
 @app.route('/temperatures', methods=('POST',))
