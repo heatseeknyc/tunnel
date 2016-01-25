@@ -1,0 +1,16 @@
+<table>
+  <tr>
+    <th>Time</th>
+    <th>ID</th>
+    <th>Short ID</th>
+    <th>Version</th>
+  </tr>
+  {% for c in cells %}
+  <tr>
+    <td>{{ c.time }}</td>
+    <td><a href="{{ url_for('cell', id=c.cell_id) }}"><code>{{ c.cell_id }}</code></a></td>
+    <td>{% if c.short_id %}<code>{{ c.short_id }}</code>{% endif %}</td>
+    <td>{% if c.version %}<code>{{ c.version }}</code>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>

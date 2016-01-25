@@ -104,6 +104,17 @@ def hub_patch(id):
     return Hub.patch(id)
 
 
+@app.route('/cells/')
+def cells():
+    cursor = db.cursor()
+    # select most recent row for each cell, and join on short id and version:
+    cursor.execute('select distinct on (cell_id)'
+                   ' cell_id, short_id, version, temperature, time'
+                   ' from temperatures left join xbees on xbees.id=cell_id left join cells on cells.id=cell_id'
+                   ' order by cell_id, time desc')
+    cells = sorted(cursor.fetchall(), key=operator.itemgetter('time'), reverse=True)
+    return flask.render_template('relay/cells.html', cells=cells)
+
 @app.route('/cells/<id>')
 def cell(id):
     cursor = db.cursor()
