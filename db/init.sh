@@ -1,3 +1,3 @@
 set -ex
 
-docker run --name db-data postgres:9 true
+docker create --name db-data postgres:9
