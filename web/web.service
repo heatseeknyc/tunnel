@@ -4,6 +4,7 @@ Requires=app.service
 
 [Service]
 TimeoutStartSec=0
+Restart=on-failure
 ExecStartPre=-/usr/bin/docker rm -f web
 ExecStartPre=/usr/bin/docker run -d --name web --link app -p 80:80 web
 ExecStart=/usr/bin/docker logs -f web

@@ -4,6 +4,7 @@ Requires=docker.service
 
 [Service]
 TimeoutStartSec=0
+Restart=on-failure
 ExecStartPre=-/usr/bin/docker rm -f tunnel
 ExecStartPre=/usr/bin/docker run -d --name tunnel -p 22:22 tunnel
 ExecStart=/usr/bin/docker logs -f tunnel

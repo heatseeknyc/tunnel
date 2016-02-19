@@ -4,6 +4,7 @@ Requires=docker.service
 
 [Service]
 TimeoutStartSec=0
+Restart=on-failure
 ExecStartPre=-/usr/bin/docker rm -f db
 ExecStartPre=/usr/bin/docker run -d --name db --volumes-from db-data db
 ExecStart=/usr/bin/docker logs -f db
