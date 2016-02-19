@@ -36,7 +36,7 @@ Ask a friend for the files to put in `tunnel/secret/`. Then:
 ```bash
 bash db/init.sh
 for x in db tunnel app web; do
-  docker build -t $x $x
+  docker build --pull --tag=$x $x
   sudo systemctl enable $PWD/$x/$x.service
   sudo systemctl start $x
 done
@@ -47,7 +47,7 @@ sudo systemctl start batch
 ## Rebuilding
 e.g. for `app`:
 
-    docker build -t app app
+    docker build --pull --tag app app
     sudo systemctl restart app
 
 ## Connecting to the Database
