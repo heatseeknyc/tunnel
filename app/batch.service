@@ -4,7 +4,7 @@ Requires=db.service
 
 [Service]
 TimeoutStartSec=0
-Restart=on-failure
+Restart=always
 ExecStartPre=-/usr/bin/docker rm -f batch
 ExecStartPre=/usr/bin/docker run -d --name batch --link db app python3 -m app.batch
 ExecStart=/usr/bin/docker logs -f batch

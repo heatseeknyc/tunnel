@@ -6,7 +6,7 @@ Requires=tunnel.service
 
 [Service]
 TimeoutStartSec=0
-Restart=on-failure
+Restart=always
 ExecStartPre=-/usr/bin/docker rm -f app
 ExecStartPre=/usr/bin/docker run -d --name app --link db --link tunnel app
 ExecStart=/usr/bin/docker logs -f app
