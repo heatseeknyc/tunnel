@@ -45,10 +45,16 @@ sudo systemctl start batch
 ```
 
 ## Rebuilding
-e.g. for `app`:
+For most modules, e.g. for `web`:
+
+    docker build --pull --tag web web
+    sudo systemctl restart web
+
+### Rebuilding the Batch Module
+The `batch` module shares a lot of code with the `app` module, so they use the same docker image:
 
     docker build --pull --tag app app
-    sudo systemctl restart app
+    sudo systemctl restart batch
 
 ## Connecting to the Database
 Examples:
