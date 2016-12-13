@@ -1,3 +1,13 @@
+# NOTE
+
+The relay server is now deployed on Heroku [(repo located here)](https://github.com/heatseeknyc/relay),
+so the majority of the code in this repository is no longer used.
+
+The only functionality that cannot be replicated on Heroku is the SSH tunneling, so this
+server is still deployed on Digital Ocean with the web facing services disabled.
+
+The domain is now `tunnel.heatseek.org`.
+
 
 # Development, on a Mac
 
@@ -22,7 +32,7 @@ Examples:
 
 ## Connecting
 
-`ssh -p 2222 core@setup.heatseeknyc.com`
+`ssh -p 2222 core@tunnel.heatseeknyc.com`
 
 ### Adding an SSH Key
 
